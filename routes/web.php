@@ -6,6 +6,7 @@ use App\Livewire\AccountSettings;
 use App\Livewire\CategoryManager;
 use App\Livewire\RecipeDetail;
 use App\Livewire\RecipeForm;
+use App\Livewire\RecipeImport;
 use App\Livewire\RecipeList;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +28,7 @@ Route::middleware('auth')->group(function () {
     // Rezepte
     Route::get('/recipes', RecipeList::class)->name('recipes.index');
     Route::get('/recipes/create', RecipeForm::class)->name('recipes.create');
+    Route::get('/recipes/import', RecipeImport::class)->name('recipes.import');
     Route::get('/recipes/{id}/edit', RecipeForm::class)->name('recipes.edit');
     Route::get('/recipes/{id}', RecipeDetail::class)->name('recipes.show');
 

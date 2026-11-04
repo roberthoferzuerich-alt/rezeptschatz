@@ -13,6 +13,7 @@ class RecipeDetail extends Component
 {
     public string $recipeId;
     public int $currentPortions = 4;
+    public string $detailTab = 'formatted'; // 'formatted' oder 'raw'
 
     public function mount(string $id): void
     {
@@ -25,6 +26,11 @@ class RecipeDetail extends Component
         })->findOrFail($id);
 
         $this->currentPortions = $recipe->portions ?: 4;
+    }
+
+    public function setTab(string $tab): void
+    {
+        $this->detailTab = in_array($tab, ['formatted', 'raw'], true) ? $tab : 'formatted';
     }
 
     public function toggleFavorite(RecipeService $recipeService): void
@@ -61,7 +67,6 @@ class RecipeDetail extends Component
               ->orWhere('is_shared', true);
         })->findOrFail($this->recipeId);
 
-        // Berechtigungsprüfung über Policy
         $this->authorize('delete', $recipe);
 
         $recipeService->deleteRecipe($recipe);
@@ -84,6 +89,86 @@ class RecipeDetail extends Component
         }
     }
 
+    public function getMarkdownContentProperty(): string
+    {
+        $user = Auth::user();
+        $recipe = Recipe::with(['categories', 'ingredients', 'steps'])
+            ->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhere('is_shared', true);
+            })
+            ->findOrFail($this->recipeId);
+
+        $scaleFactor = ($recipe->portions > 0) ? ($this->currentPortions / $recipe->portions) : 1;
+
+        $md = "# {$recipe->title}\n\n";
+
+        if (!empty($recipe->description)) {
+            $md .= "{$recipe->description}\n\n";
+        }
+
+        $md .= "### Details\n";
+        $md .= "- **Portionen:** {$this->currentPortions}\n";
+        if ($recipe->prep_time_minutes) {
+            $md .= "- **Vorbereitungszeit:** {$recipe->prep_time_minutes} Min.\n";
+        }
+        if ($recipe->cook_time_minutes) {
+            $md .= "- **Koch- / Backzeit:** {$recipe->cook_time_minutes} Min.\n";
+        }
+        if ($recipe->rest_time_minutes) {
+            $md .= "- **Ruhezeit:** {$recipe->rest_time_minutes} Min.\n";
+        }
+        if ($recipe->categories->isNotEmpty()) {
+            $categoriesList = $recipe->categories->pluck('name')->join(', ');
+            $md .= "- **Kategorien:** {$categoriesList}\n";
+        }
+        $md .= "\n";
+
+        // Zutaten
+        $md .= "## Zutaten\n\n";
+        $grouped = $recipe->ingredients->groupBy(fn($i) => $i->group_name ?: 'Hauptzutaten');
+
+        foreach ($grouped as $groupName => $items) {
+            if ($grouped->count() > 1 || $groupName !== 'Hauptzutaten') {
+                $md .= "### {$groupName}\n";
+            }
+            foreach ($items as $item) {
+                $amount = '';
+                if ($item->amount_numeric !== null) {
+                    $scaled = round($item->amount_numeric * $scaleFactor, 2);
+                    $formatted = ($scaled == (int)$scaled) ? (int)$scaled : number_format($scaled, 1, ',', '');
+                    $amount = $formatted . ($item->unit ? ' ' . $item->unit : '');
+                } elseif ($item->unit) {
+                    $amount = $item->unit;
+                }
+
+                if ($item->amount_text) {
+                    $amount .= ($amount ? ' ' : '') . '(' . $item->amount_text . ')';
+                }
+
+                $amount = trim($amount);
+                $md .= $amount ? "- {$amount} {$item->name}\n" : "- {$item->name}\n";
+            }
+            $md .= "\n";
+        }
+
+        // Zubereitungsschritte
+        $md .= "## Zubereitung\n\n";
+        foreach ($recipe->steps->sortBy('step_number') as $step) {
+            $md .= "{$step->step_number}. {$step->instruction}\n";
+        }
+
+        if (!empty($recipe->notes)) {
+            $md .= "\n## Notizen\n{$recipe->notes}\n";
+        }
+
+        if (!empty($recipe->source_url)) {
+            $md .= "\n---\n**Quelle:** [{$recipe->source_url}]({$recipe->source_url})\n";
+        }
+
+        return trim($md);
+    }
+
     public function render()
     {
         $user = Auth::user();
@@ -102,6 +187,7 @@ class RecipeDetail extends Component
         return view('livewire.recipe-detail', [
             'recipe' => $recipe,
             'groupedIngredients' => $groupedIngredients,
+            'markdownContent' => $this->markdownContent,
             'canEdit' => $user->can('update', $recipe),
             'canDelete' => $user->can('delete', $recipe),
             'isOwner' => ($recipe->user_id === $user->id),

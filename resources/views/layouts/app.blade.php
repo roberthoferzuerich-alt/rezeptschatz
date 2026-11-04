@@ -102,9 +102,9 @@
                                 <span>Mit ChatGPT kochen</span>
                                 <span class="text-[10px] uppercase font-bold bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded">KI</span>
                             </a>
-                            <a href="{{ route('account.index', ['tab' => 'websites']) }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                            <a href="{{ route('recipes.import') }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
                                 <span>Importiere Rezepte</span>
-                                <span class="text-[10px] uppercase font-bold bg-stone-100 text-stone-500 px-1.5 py-0.5 rounded">In Kürze</span>
+                                <span class="text-[10px] uppercase font-bold bg-[#8ea92c]/15 text-[#8ea92c] px-1.5 py-0.5 rounded">Neu</span>
                             </a>
 
                             <hr class="my-1.5 border-stone-100">

@@ -185,4 +185,41 @@ class RecipeWebTest extends TestCase
             ->assertSee('Spinat-Nudelpfanne')
             ->assertSee('400 g TK-Blattspinat');
     }
+
+    public function test_user_can_view_raw_markdown_in_recipe_detail(): void
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+
+        $recipe = Recipe::create([
+            'user_id' => $user->id,
+            'title' => 'Cajun-Kartoffelspalten',
+            'portions' => 4,
+            'server_version' => 1,
+            'is_shared' => true,
+        ]);
+
+        $recipe->ingredients()->create([
+            'name' => 'Kartoffeln vorwiegend festkochend',
+            'amount_numeric' => 800,
+            'unit' => 'g',
+            'sort_order' => 1,
+        ]);
+
+        $recipe->steps()->create([
+            'step_number' => 1,
+            'instruction' => 'Kartoffeln waschen und in Spalten schneiden.',
+        ]);
+
+        \Livewire\Livewire::actingAs($user)
+            ->test(\App\Livewire\RecipeDetail::class, ['id' => $recipe->id])
+            ->assertSet('detailTab', 'formatted')
+            ->assertSee('Formatiert')
+            ->assertSee('Raw Markdown')
+            ->call('setTab', 'raw')
+            ->assertSet('detailTab', 'raw')
+            ->assertSee('# Cajun-Kartoffelspalten')
+            ->assertSee('800 g Kartoffeln vorwiegend festkochend')
+            ->assertSee('1. Kartoffeln waschen und in Spalten schneiden.')
+            ->assertSee('In Zwischenablage kopieren');
+    }
 }
