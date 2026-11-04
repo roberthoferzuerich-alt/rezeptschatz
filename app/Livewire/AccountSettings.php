@@ -119,3 +119,4 @@ class AccountSettings extends Component
         ]);
     }
 }
+

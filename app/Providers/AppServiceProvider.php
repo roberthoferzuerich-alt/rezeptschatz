@@ -19,10 +19,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if ($appUrl = config('app.url')) {
-            \Illuminate\Support\Facades\URL::forceRootUrl($appUrl);
-            if (str_starts_with($appUrl, 'https://')) {
-                \Illuminate\Support\Facades\URL::forceScheme('https');
+        // Auf Produktionsservern (z. B. Raspberry Pi) erzwingen wir die feste Domain und Port
+        // Lokal (Laragon) übernimmt Laravel dynamisch die Domain und den Port des Browsers
+        if (!app()->environment('local')) {
+            if ($appUrl = config('app.url')) {
+                \Illuminate\Support\Facades\URL::forceRootUrl($appUrl);
+                if (str_starts_with($appUrl, 'https://')) {
+                    \Illuminate\Support\Facades\URL::forceScheme('https');
+                }
             }
         }
     }
