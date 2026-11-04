@@ -155,4 +155,34 @@ class RecipeWebTest extends TestCase
         $this->assertTrue($father->can('create', Category::class));
         $this->assertFalse($daughter->can('create', Category::class));
     }
+
+    public function test_user_can_toggle_between_grid_and_list_view(): void
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+
+        $recipe = Recipe::create([
+            'user_id' => $user->id,
+            'title' => 'Spinat-Nudelpfanne',
+            'portions' => 4,
+            'server_version' => 1,
+            'is_shared' => true,
+        ]);
+
+        $recipe->ingredients()->create([
+            'name' => 'TK-Blattspinat',
+            'amount_numeric' => 400,
+            'unit' => 'g',
+            'sort_order' => 1,
+        ]);
+
+        \Livewire\Livewire::actingAs($user)
+            ->test(\App\Livewire\RecipeList::class)
+            ->assertSet('viewMode', 'grid')
+            ->assertSee('format_list_bulleted')
+            ->call('toggleViewMode')
+            ->assertSet('viewMode', 'list')
+            ->assertSee('grid_view')
+            ->assertSee('Spinat-Nudelpfanne')
+            ->assertSee('400 g TK-Blattspinat');
+    }
 }

@@ -31,6 +31,19 @@ class RecipeList extends Component
     #[Url(as: 'sort')]
     public string $sortBy = 'updated_at';
 
+    #[Url(as: 'view')]
+    public string $viewMode = 'grid'; // 'grid' oder 'list'
+
+    public function toggleViewMode(): void
+    {
+        $this->viewMode = ($this->viewMode === 'grid') ? 'list' : 'grid';
+    }
+
+    public function setViewMode(string $mode): void
+    {
+        $this->viewMode = in_array($mode, ['grid', 'list'], true) ? $mode : 'grid';
+    }
+
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -88,7 +101,7 @@ class RecipeList extends Component
     {
         $userId = Auth::id();
 
-        $query = Recipe::with(['categories', 'user', 'favoritedBy'])
+        $query = Recipe::with(['categories', 'user', 'favoritedBy', 'ingredients'])
             ->where(function ($q) use ($userId) {
                 $q->where('user_id', $userId)
                   ->orWhere('is_shared', true);
@@ -132,11 +145,17 @@ class RecipeList extends Component
             case 'title':
                 $query->orderBy('title', 'asc');
                 break;
-            case 'total_time':
-                $query->orderByRaw('COALESCE(prep_time_minutes, 0) + COALESCE(cook_time_minutes, 0) asc');
+            case 'last_viewed':
+                $query->orderByDesc('updated_at');
                 break;
             case 'created_at':
                 $query->orderByDesc('created_at');
+                break;
+            case 'rating':
+                $query->orderByDesc('is_favorite')->orderByDesc('updated_at');
+                break;
+            case 'total_time':
+                $query->orderByRaw('COALESCE(prep_time_minutes, 0) + COALESCE(cook_time_minutes, 0) asc');
                 break;
             case 'updated_at':
             default:
