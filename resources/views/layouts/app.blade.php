@@ -5,15 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'Rezeptbuch' }} – Private Rezeptverwaltung</title>
+    <title>{{ $title ?? 'Rezeptschatz' }} – Private Rezeptverwaltung</title>
 
-    <!-- Tailwind CSS (CDN für garantierte lokale Direktfunktion in Laragon) -->
+    <!-- Tailwind CSS (CDN für garantierte lokale Direktfunktion) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
+                        cookmate: {
+                            DEFAULT: '#8ea92c',
+                            dark: '#7e9626',
+                            light: '#9bb730',
+                        },
                         brand: {
                             50: '#f4f8ec',
                             100: '#e7f0d4',
@@ -38,70 +43,338 @@
     @livewireStyles
 </head>
 <body class="h-full flex flex-col font-sans antialiased text-stone-800">
-    <!-- Kopfbereich / Navigation -->
-    <header class="bg-brand-600 text-white shadow-md sticky top-0 z-40">
+    <!-- COOKmate-Style Header-Navigation -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-40 shadow-xs" x-data="{ mobileOpen: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- Logo & Titel -->
+            <div class="flex items-center justify-between h-14">
+                
+                <!-- Logo & Brand (links) -->
                 <div class="flex items-center space-x-3">
-                    <a href="{{ route('recipes.index') }}" class="flex items-center space-x-2 text-xl font-bold tracking-tight text-white hover:text-brand-100 transition">
-                        <span class="material-symbols-outlined text-2xl">menu_book</span>
-                        <span>Rezeptbuch</span>
+                    <a href="{{ route('recipes.index') }}" class="flex items-center space-x-2 text-stone-800 hover:text-[#8ea92c] transition font-bold text-lg tracking-tight">
+                        <span class="w-8 h-8 rounded-lg bg-[#8ea92c] text-white flex items-center justify-center shadow-xs">
+                            <span class="material-symbols-outlined text-xl">menu_book</span>
+                        </span>
+                        <span class="hidden sm:inline">Rezeptschatz</span>
                     </a>
                 </div>
 
-                <!-- Navigation Links (Desktop) -->
-                <nav class="hidden md:flex items-center space-x-4">
-                    <a href="{{ route('recipes.index') }}" class="px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('recipes.index') ? 'bg-brand-700 text-white' : 'text-brand-100 hover:bg-brand-500 hover:text-white' }} transition">
-                        Rezepte
+                <!-- Desktop Navigation Links (rechts) -->
+                <nav class="hidden md:flex items-center space-x-5 text-sm text-stone-700 font-medium">
+                    
+                    <!-- 1. Rezepte > -->
+                    <div class="relative" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
+                        <button type="button" @click="open = !open" class="flex items-center hover:text-stone-900 transition py-4 focus:outline-none">
+                            <span>Rezepte</span>
+                            <span class="text-stone-400 font-normal ml-1 text-xs select-none">&gt;</span>
+                        </button>
+
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="opacity-0 transform scale-95"
+                             x-transition:enter-end="opacity-100 transform scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="opacity-100 transform scale-100"
+                             x-transition:leave-end="opacity-0 transform scale-95"
+                             class="absolute left-0 mt-0 w-60 bg-white rounded-b-xl shadow-xl border border-stone-200/80 py-2 z-50 text-stone-700"
+                             style="display: none;">
+                            <div class="h-0.5 bg-[#8ea92c] -mt-2 mb-1 rounded-t"></div>
+                            <a href="{{ route('recipes.index') }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                Liste der Rezepte
+                            </a>
+                            <a href="{{ route('recipes.index', ['author' => 'shared']) }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                Rezepte meiner Freunde
+                            </a>
+                            <a href="{{ route('recipes.index') }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                Neues Rezept suchen
+                            </a>
+
+                            <hr class="my-1.5 border-stone-100">
+
+                            <a href="{{ route('recipes.create') }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] font-semibold text-stone-800 transition">
+                                <span>Rezept erstellen</span>
+                                <span class="material-symbols-outlined text-base text-[#8ea92c]">add_circle</span>
+                            </a>
+                            <a href="{{ route('account.index', ['tab' => 'help']) }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                <span>Scann ein Rezept</span>
+                                <span class="text-[10px] uppercase font-bold bg-stone-100 text-stone-500 px-1.5 py-0.5 rounded">In Kürze</span>
+                            </a>
+                            <a href="{{ route('account.index', ['tab' => 'help']) }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                <span>Mit ChatGPT kochen</span>
+                                <span class="text-[10px] uppercase font-bold bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded">KI</span>
+                            </a>
+                            <a href="{{ route('account.index', ['tab' => 'websites']) }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                <span>Importiere Rezepte</span>
+                                <span class="text-[10px] uppercase font-bold bg-stone-100 text-stone-500 px-1.5 py-0.5 rounded">In Kürze</span>
+                            </a>
+
+                            <hr class="my-1.5 border-stone-100">
+
+                            <a href="{{ route('categories.index') }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                Kategorien
+                            </a>
+                            <a href="{{ route('account.index', ['tab' => 'help']) }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                <span>Schlagwörter</span>
+                                <span class="text-[10px] uppercase font-bold bg-stone-100 text-stone-500 px-1.5 py-0.5 rounded">In Kürze</span>
+                            </a>
+                            <a href="{{ route('account.index', ['tab' => 'help']) }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                <span>Verknüpfte Rezepte</span>
+                                <span class="text-[10px] uppercase font-bold bg-stone-100 text-stone-500 px-1.5 py-0.5 rounded">In Kürze</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 2. Neues Rezept suchen > -->
+                    <div class="relative" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
+                        <button type="button" @click="open = !open" class="flex items-center hover:text-stone-900 transition py-4 focus:outline-none">
+                            <span>Neues Rezept suchen</span>
+                            <span class="text-stone-400 font-normal ml-1 text-xs select-none">&gt;</span>
+                        </button>
+
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="opacity-0 transform scale-95"
+                             x-transition:enter-end="opacity-100 transform scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="opacity-100 transform scale-100"
+                             x-transition:leave-end="opacity-0 transform scale-95"
+                             class="absolute left-0 mt-0 w-52 bg-white rounded-b-xl shadow-xl border border-stone-200/80 py-2 z-50 text-stone-700"
+                             style="display: none;">
+                            <div class="h-0.5 bg-[#8ea92c] -mt-2 mb-1 rounded-t"></div>
+                            <a href="{{ route('recipes.index') }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                Neues Rezept suchen
+                            </a>
+                            <a href="{{ route('recipes.index', ['fav' => 1]) }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                <span>Lesezeichen</span>
+                                <span class="material-symbols-outlined text-amber-500 text-base">star</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 3. Einkaufsliste -->
+                    <a href="{{ route('account.index', ['tab' => 'help']) }}" class="hover:text-stone-900 transition flex items-center space-x-1" title="Einkaufsliste">
+                        <span>Einkaufsliste</span>
                     </a>
-                    <a href="{{ route('categories.index') }}" class="px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('categories.index') ? 'bg-brand-700 text-white' : 'text-brand-100 hover:bg-brand-500 hover:text-white' }} transition">
-                        Kategorien
+
+                    <!-- 4. Menüplaner -->
+                    <a href="{{ route('account.index', ['tab' => 'help']) }}" class="hover:text-stone-900 transition flex items-center space-x-1" title="Menüplaner">
+                        <span>Menüplaner</span>
                     </a>
-                    <a href="{{ route('recipes.create') }}" class="flex items-center space-x-1 bg-white text-brand-700 hover:bg-brand-50 px-3 py-2 rounded-md text-sm font-semibold shadow-sm transition">
-                        <span class="material-symbols-outlined text-base">add</span>
-                        <span>Neues Rezept</span>
-                    </a>
+
+                    <!-- 5. Mehr > -->
+                    <div class="relative" x-data="{ open: false }" @click.outside="open = false" @mouseenter="open = true" @mouseleave="open = false">
+                        <button type="button" @click="open = !open" class="flex items-center hover:text-stone-900 transition py-4 focus:outline-none">
+                            <span>Mehr</span>
+                            <span class="text-stone-400 font-normal ml-1 text-xs select-none">&gt;</span>
+                        </button>
+
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="opacity-0 transform scale-95"
+                             x-transition:enter-end="opacity-100 transform scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="opacity-100 transform scale-100"
+                             x-transition:leave-end="opacity-0 transform scale-95"
+                             class="absolute left-0 mt-0 w-56 bg-white rounded-b-xl shadow-xl border border-stone-200/80 py-2 z-50 text-stone-700"
+                             style="display: none;">
+                            <div class="h-0.5 bg-[#8ea92c] -mt-2 mb-1 rounded-t"></div>
+                            <a href="{{ route('account.index', ['tab' => 'settings']) }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                Einstellungen
+                            </a>
+                            <a href="{{ route('account.index', ['tab' => 'news']) }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                Neuigkeiten
+                            </a>
+                            <a href="{{ route('account.index', ['tab' => 'websites']) }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                Unterstützte Webseiten
+                            </a>
+                            <a href="{{ route('account.index', ['tab' => 'credits']) }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                Blog
+                            </a>
+                            <a href="{{ route('account.index', ['tab' => 'help']) }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                                Hilfe und Support
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Trennlinie vertikal | -->
+                    <div class="h-6 w-px bg-stone-300"></div>
+
+                    <!-- 6. User Dropdown / "Dein Konto" Fenster (rechts wie im Screenshot) -->
+                    <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                        <button type="button" @click="open = !open" 
+                                class="flex items-center space-x-2 py-1.5 px-2 rounded-lg hover:bg-stone-100 text-stone-800 transition focus:outline-none">
+                            <span class="w-7 h-7 rounded-full bg-stone-200 text-stone-500 flex items-center justify-center overflow-hidden">
+                                <span class="material-symbols-outlined text-2xl" style="font-size: 26px; line-height: 1;">account_circle</span>
+                            </span>
+                            <span class="font-medium text-sm text-stone-800">{{ Auth::user()->name }}</span>
+                            <span class="text-stone-400 font-normal text-xs select-none">&gt;</span>
+                        </button>
+
+                        <!-- Das originale grüne Fenster "Dein Konto" -->
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="opacity-0 transform scale-95 -translate-y-2"
+                             x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="opacity-100 transform scale-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 transform scale-95 -translate-y-2"
+                             class="absolute right-0 mt-1 w-72 bg-[#8ea92c] text-white rounded-xl shadow-2xl p-5 z-50"
+                             style="display: none;">
+                            
+                            <h3 class="text-white font-bold text-base mb-3 tracking-wide">
+                                Dein Konto
+                            </h3>
+
+                            <ul class="space-y-2.5 text-sm font-medium text-white/95">
+                                <li>
+                                    <a href="{{ route('account.index', ['tab' => 'account']) }}" 
+                                       @click="open = false"
+                                       class="flex items-center space-x-2.5 hover:underline transition">
+                                        <span class="text-base leading-none">•</span>
+                                        <span>Account-Informationen</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('account.index', ['tab' => 'personal']) }}" 
+                                       @click="open = false"
+                                       class="flex items-center space-x-2.5 hover:underline transition">
+                                        <span class="text-base leading-none">•</span>
+                                        <span>Persönliche Informationen</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('account.index', ['tab' => 'password']) }}" 
+                                       @click="open = false"
+                                       class="flex items-center space-x-2.5 hover:underline transition">
+                                        <span class="text-base leading-none">•</span>
+                                        <span>Passwort ändern</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('account.index', ['tab' => 'credits']) }}" 
+                                       @click="open = false"
+                                       class="flex items-center space-x-2.5 hover:underline transition">
+                                        <span class="text-base leading-none">•</span>
+                                        <span>Credits</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('account.index', ['tab' => 'notifications']) }}" 
+                                       @click="open = false"
+                                       class="flex items-center space-x-2.5 hover:underline transition">
+                                        <span class="text-base leading-none">•</span>
+                                        <span>E-Mail-Benachrichtigungen</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('account.index', ['tab' => 'settings']) }}" 
+                                       @click="open = false"
+                                       class="flex items-center space-x-2.5 hover:underline transition">
+                                        <span class="text-base leading-none">•</span>
+                                        <span>COOKmate-Einstellungen</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('account.index', ['tab' => 'header-image']) }}" 
+                                       @click="open = false"
+                                       class="flex items-center space-x-2.5 hover:underline transition">
+                                        <span class="text-base leading-none">•</span>
+                                        <span>Ändere das Kopfzeilenbild</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('account.index', ['tab' => 'close-account']) }}" 
+                                       @click="open = false"
+                                       class="flex items-center space-x-2.5 hover:underline transition">
+                                        <span class="text-base leading-none">•</span>
+                                        <span>Schließe deinen Account</span>
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <!-- Abmelden-Option -->
+                            <div class="border-t border-white/25 pt-3 mt-4">
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" 
+                                            class="w-full flex items-center justify-between text-xs font-semibold text-white/95 hover:text-white bg-black/15 hover:bg-black/25 px-3 py-2 rounded-lg transition">
+                                        <span>Abmelden</span>
+                                        <span class="material-symbols-outlined text-sm">logout</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
                 </nav>
 
-                <!-- Benutzer-Menü / Logout -->
-                <div class="flex items-center space-x-3">
-                    <div class="hidden sm:flex items-center space-x-2 text-sm text-brand-100">
-                        <span class="material-symbols-outlined text-lg">account_circle</span>
-                        <span>{{ Auth::user()->name }}</span>
-                    </div>
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
-                        @csrf
-                        <button type="submit" title="Abmelden" class="flex items-center space-x-1 text-brand-100 hover:text-white hover:bg-brand-700 px-2.5 py-1.5 rounded text-sm transition">
-                            <span class="material-symbols-outlined text-lg">logout</span>
-                            <span class="hidden sm:inline">Abmelden</span>
-                        </button>
-                    </form>
+                <!-- Mobile Hamburger Button -->
+                <div class="flex items-center md:hidden space-x-2">
+                    <button type="button" @click="mobileOpen = !mobileOpen" 
+                            class="p-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 focus:outline-none">
+                        <span class="material-symbols-outlined text-2xl" x-text="mobileOpen ? 'close' : 'menu'">menu</span>
+                    </button>
                 </div>
+
             </div>
         </div>
 
-        <!-- Mobile Navigation Leiste -->
-        <div class="md:hidden border-t border-brand-500 bg-brand-700 px-4 py-2 flex justify-around">
-            <a href="{{ route('recipes.index') }}" class="text-xs text-brand-100 hover:text-white flex flex-col items-center">
-                <span class="material-symbols-outlined text-lg">restaurant_menu</span>
-                <span>Rezepte</span>
-            </a>
-            <a href="{{ route('categories.index') }}" class="text-xs text-brand-100 hover:text-white flex flex-col items-center">
-                <span class="material-symbols-outlined text-lg">label</span>
-                <span>Kategorien</span>
-            </a>
-            <a href="{{ route('recipes.create') }}" class="text-xs text-brand-100 hover:text-white flex flex-col items-center">
-                <span class="material-symbols-outlined text-lg">add_circle</span>
-                <span>Erstellen</span>
-            </a>
+        <!-- Mobile Drawer Menü -->
+        <div x-show="mobileOpen" 
+             x-transition 
+             class="md:hidden border-t border-stone-200 bg-white px-4 pt-3 pb-6 space-y-4 shadow-lg text-stone-700" 
+             style="display: none;">
+            
+            <!-- Benutzer Info Mobile -->
+            <div class="flex items-center space-x-3 pb-3 border-b border-stone-200">
+                <span class="w-8 h-8 rounded-full bg-stone-300 text-stone-600 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-2xl text-stone-400">account_circle</span>
+                </span>
+                <div>
+                    <div class="font-semibold text-sm text-stone-900">{{ Auth::user()->name }}</div>
+                    <div class="text-xs text-stone-500">{{ Auth::user()->email }}</div>
+                </div>
+            </div>
+
+            <div class="space-y-1 text-sm font-medium">
+                <div class="text-xs uppercase text-stone-400 font-bold px-2 py-1">Rezepte</div>
+                <a href="{{ route('recipes.index') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100">Liste der Rezepte</a>
+                <a href="{{ route('recipes.index', ['author' => 'shared']) }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100">Rezepte meiner Freunde</a>
+                <a href="{{ route('recipes.index', ['fav' => 1]) }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100 flex items-center justify-between">
+                    <span>Lesezeichen (Favoriten)</span>
+                    <span class="material-symbols-outlined text-amber-500 text-sm">star</span>
+                </a>
+                <a href="{{ route('recipes.create') }}" class="block px-3 py-2 rounded-lg bg-stone-100 text-[#8ea92c] font-bold flex items-center space-x-1">
+                    <span class="material-symbols-outlined text-base">add</span>
+                    <span>Rezept erstellen</span>
+                </a>
+                <a href="{{ route('categories.index') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100">Kategorien</a>
+            </div>
+
+            <div class="pt-2 border-t border-stone-200 space-y-1 text-sm font-medium">
+                <div class="text-xs uppercase text-stone-400 font-bold px-2 py-1">Dein Konto</div>
+                <a href="{{ route('account.index', ['tab' => 'account']) }}" class="block px-3 py-1.5 rounded-lg hover:bg-stone-100">• Account-Informationen</a>
+                <a href="{{ route('account.index', ['tab' => 'personal']) }}" class="block px-3 py-1.5 rounded-lg hover:bg-stone-100">• Persönliche Informationen</a>
+                <a href="{{ route('account.index', ['tab' => 'password']) }}" class="block px-3 py-1.5 rounded-lg hover:bg-stone-100">• Passwort ändern</a>
+                <a href="{{ route('account.index', ['tab' => 'credits']) }}" class="block px-3 py-1.5 rounded-lg hover:bg-stone-100">• Credits</a>
+                <a href="{{ route('account.index', ['tab' => 'settings']) }}" class="block px-3 py-1.5 rounded-lg hover:bg-stone-100">• Einstellungen</a>
+            </div>
+
+            <div class="pt-3 border-t border-stone-200">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold rounded-lg text-sm transition">
+                        <span class="material-symbols-outlined text-lg">logout</span>
+                        <span>Abmelden</span>
+                    </button>
+                </form>
+            </div>
         </div>
     </header>
 
     <!-- Flash Messages -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full">
         @if (session('success'))
-            <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-md shadow-sm mb-4 flex items-center justify-between">
+            <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-md shadow-xs mb-4 flex items-center justify-between">
                 <div class="flex items-center space-x-2 text-emerald-800">
                     <span class="material-symbols-outlined text-xl">check_circle</span>
                     <span class="text-sm font-medium">{{ session('success') }}</span>
@@ -109,7 +382,7 @@
             </div>
         @endif
         @if (session('error'))
-            <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-md shadow-sm mb-4 flex items-center justify-between">
+            <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-md shadow-xs mb-4 flex items-center justify-between">
                 <div class="flex items-center space-x-2 text-rose-800">
                     <span class="material-symbols-outlined text-xl">error</span>
                     <span class="text-sm font-medium">{{ session('error') }}</span>
@@ -127,11 +400,10 @@
     <!-- Fussbereich -->
     <footer class="bg-white border-t border-stone-200 py-4 mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-stone-500">
-            <span>Rezeptbuch &bull; Private Rezeptverwaltung &bull; Verbunden mit MySQL</span>
+            <span>Rezeptschatz &bull; Private Rezeptverwaltung &bull; Verbunden mit MariaDB</span>
         </div>
     </footer>
 
     @livewireScripts
 </body>
 </html>
-

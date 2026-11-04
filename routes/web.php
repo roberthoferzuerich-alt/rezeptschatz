@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\RecipeImageController;
+use App\Livewire\AccountSettings;
 use App\Livewire\CategoryManager;
 use App\Livewire\RecipeDetail;
 use App\Livewire\RecipeForm;
@@ -34,4 +35,7 @@ Route::middleware('auth')->group(function () {
 
     // Kategorien
     Route::get('/categories', CategoryManager::class)->name('categories.index');
+
+    // Benutzerkonto & Einstellungen ("Dein Konto")
+    Route::get('/account', AccountSettings::class)->name('account.index');
 });
