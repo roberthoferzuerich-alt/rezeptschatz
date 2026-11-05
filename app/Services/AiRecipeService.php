@@ -213,9 +213,14 @@ JSON;
             Cache::forget('gemini_active_model');
         }
 
+        $curlOptions = defined('CURLOPT_IPRESOLVE') ? [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4] : [];
+
         // 2. Dynamische Live-Abfrage der tatsächlich für diesen API-Schlüssel freigeschalteten Modelle
         try {
-            $resp = Http::withOptions(['verify' => false])
+            $resp = Http::withOptions([
+                'verify' => false,
+                'curl' => $curlOptions,
+            ])
                 ->timeout(8)
                 ->get("https://generativelanguage.googleapis.com/v1beta/models?key={$apiKey}");
 
@@ -298,11 +303,15 @@ JSON;
             ],
         ];
 
+        $curlOptions = defined('CURLOPT_IPRESOLVE') ? [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4] : [];
         $lastError = null;
         foreach ($modelsToTry as $model) {
             $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
-            $response = Http::withOptions(['verify' => false])
+            $response = Http::withOptions([
+                'verify' => false,
+                'curl' => $curlOptions,
+            ])
                 ->timeout(90)
                 ->post($url, $payload);
 
@@ -364,11 +373,15 @@ JSON;
             ],
         ];
 
+        $curlOptions = defined('CURLOPT_IPRESOLVE') ? [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4] : [];
         $lastError = null;
         foreach ($modelsToTry as $model) {
             $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
-            $response = Http::withOptions(['verify' => false])
+            $response = Http::withOptions([
+                'verify' => false,
+                'curl' => $curlOptions,
+            ])
                 ->timeout(90)
                 ->post($url, $payload);
 

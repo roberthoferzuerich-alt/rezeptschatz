@@ -90,37 +90,58 @@ class TestAiConnectionCommand extends Command
                 return;
             }
 
-            // 2. Testaufruf an die ersten funktionierenden Modelle
-            $testCandidate = $contentModels[0];
-            foreach ($contentModels as $c) {
-                if (str_contains($c, '3.8-flash')) {
-                    $testCandidate = $c;
-                    break;
+            $this->info("Gefundene Modelle mit generateContent (" . count($contentModels) . "):");
+            $this->line("  " . implode(', ', $contentModels));
+            $this->newLine();
+
+            // 2. Testaufruf an die Kandidaten (mit erzwungenem IPv4 zur Vermeidung von Router/IPv6-Hängern)
+            $curlOptions = defined('CURLOPT_IPRESOLVE') ? [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4] : [];
+
+            $success = false;
+            foreach ($contentModels as $candidate) {
+                // Bevorzuge moderne Flash- und Pro-Modelle
+                if (str_contains($candidate, 'embedding') || str_contains($candidate, 'aqa')) {
+                    continue;
                 }
-                if (str_contains($c, 'flash')) {
-                    $testCandidate = $c;
+
+                $this->line("Teste Modell: <comment>{$candidate}</comment> (Timeout: 15s, IPv4)...");
+
+                $testUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$candidate}:generateContent?key={$apiKey}";
+                try {
+                    $start = microtime(true);
+                    $testResponse = Http::withOptions([
+                        'verify' => false,
+                        'curl' => $curlOptions,
+                    ])->timeout(15)->post($testUrl, [
+                        'contents' => [
+                            [
+                                'parts' => [
+                                    ['text' => 'Antworte mit exakt einem Wort auf Deutsch: Bereit!'],
+                                ],
+                            ],
+                        ],
+                    ]);
+
+                    $duration = round(microtime(true) - $start, 2);
+
+                    if ($testResponse->successful()) {
+                        $text = $testResponse->json('candidates.0.content.parts.0.text') ?? '(Keine Antwort)';
+                        $this->info("✓ ERFOLG mit '{$candidate}' in {$duration}s! Antwort: " . trim($text));
+                        \Illuminate\Support\Facades\Cache::forever('gemini_active_model', $candidate);
+                        $this->info("Modell '{$candidate}' wurde als Standard im Cache gespeichert!");
+                        $success = true;
+                        break;
+                    } else {
+                        $err = $testResponse->json('error.message') ?? $testResponse->body();
+                        $this->warn("  ✗ HTTP {$testResponse->status()} ({$candidate}): {$err}");
+                    }
+                } catch (\Throwable $e) {
+                    $this->warn("  ✗ Fehler bei {$candidate}: " . $e->getMessage());
                 }
             }
 
-            $this->info("Führe Test-Generierung mit Modell '{$testCandidate}' durch (Timeout: 45s)...");
-
-            $testUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$testCandidate}:generateContent?key={$apiKey}";
-            $testResponse = Http::withOptions(['verify' => false])->timeout(45)->post($testUrl, [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => 'Antworte mit exakt einem Wort auf Deutsch: Bereit!'],
-                        ],
-                    ],
-                ],
-            ]);
-
-            if ($testResponse->successful()) {
-                $text = $testResponse->json('candidates.0.content.parts.0.text') ?? '(Keine Antwort)';
-                $this->info("ERFOLG! Google Gemini Antwort: " . trim($text));
-            } else {
-                $this->error("Fehler bei Test-Generierung: HTTP {$testResponse->status()}");
-                $this->line("Details: " . $testResponse->body());
+            if (!$success) {
+                $this->error("Keines der Modelle konnte erfolgreich kontaktiert werden.");
             }
 
         } catch (\Throwable $e) {
