@@ -133,6 +133,39 @@
                     </div>
                 </div>
 
+                <!-- Nährwerte-Leiste (falls vorhanden) -->
+                @if ($recipe->calories || $recipe->protein || $recipe->fat || $recipe->carbohydrates || $recipe->nutrition_raw)
+                    <div class="mt-4 p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200/60 flex flex-wrap items-center justify-between gap-3 text-xs">
+                        <div class="flex items-center space-x-1.5 font-bold text-emerald-900">
+                            <span class="material-symbols-outlined text-base text-[#8ea92c]">nutrition</span>
+                            <span>Nährwerte pro Portion:</span>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                            @if ($recipe->calories)
+                                <div class="bg-white px-2.5 py-1 rounded-md border border-emerald-200/80 font-semibold text-stone-800 shadow-2xs">
+                                    <span class="text-emerald-700 font-bold">{{ $recipe->calories }}</span> kcal
+                                </div>
+                            @endif
+                            @if ($recipe->protein)
+                                <div class="bg-white px-2.5 py-1 rounded-md border border-emerald-200/80 text-stone-700 shadow-2xs">
+                                    Eiweiß: <strong class="text-stone-900">{{ $recipe->protein }} g</strong>
+                                </div>
+                            @endif
+                            @if ($recipe->fat)
+                                <div class="bg-white px-2.5 py-1 rounded-md border border-emerald-200/80 text-stone-700 shadow-2xs">
+                                    Fett: <strong class="text-stone-900">{{ $recipe->fat }} g</strong>
+                                </div>
+                            @endif
+                            @if ($recipe->carbohydrates)
+                                <div class="bg-white px-2.5 py-1 rounded-md border border-emerald-200/80 text-stone-700 shadow-2xs">
+                                    Kohlenhydrate: <strong class="text-stone-900">{{ $recipe->carbohydrates }} g</strong>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Hauptbereich: Zutaten & Zubereitung -->
                 <div class="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
                     <!-- Zutaten -->

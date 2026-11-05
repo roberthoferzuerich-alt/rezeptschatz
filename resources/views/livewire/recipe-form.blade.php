@@ -115,19 +115,58 @@
         </div>
 
         <!-- 2. Kategorien -->
-        <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 space-y-3">
-            <h2 class="text-base font-bold text-stone-900 border-b border-stone-100 pb-2 flex items-center space-x-2">
-                <span class="material-symbols-outlined text-brand-600">label</span>
-                <span>Kategorien</span>
-            </h2>
-            <div class="flex flex-wrap gap-2 pt-1">
-                @foreach ($categories as $cat)
-                    <label class="cursor-pointer inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium border transition {{ in_array($cat->id, $selectedCategoryIds) ? 'bg-brand-600 border-brand-700 text-white shadow-sm' : 'bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100' }}">
-                        <input wire:model="selectedCategoryIds" type="checkbox" value="{{ $cat->id }}" class="hidden">
-                        <span class="w-2 h-2 rounded-full" style="background-color: {{ $cat->color ?? '#7a9c33' }};"></span>
+        <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-stone-100 pb-3 gap-2">
+                <div class="flex items-center space-x-2">
+                    <span class="material-symbols-outlined text-[#8ea92c]">label</span>
+                    <h2 class="text-base font-bold text-stone-900">Kategorien</h2>
+                    <span class="text-xs text-stone-500 font-medium">({{ count($selectedCategoryIds) }} ausgewählt)</span>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <!-- Suchfilter für Kategorien -->
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-2 top-1.5 text-stone-400 text-sm pointer-events-none">search</span>
+                        <input wire:model.live.debounce.150ms="categorySearch" type="text" placeholder="Kategorien filtern..." 
+                               class="pl-7 pr-2 py-1 text-xs border border-stone-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#8ea92c]">
+                    </div>
+
+                    @if (count($selectedCategoryIds) > 0)
+                        <button type="button" wire:click="deselectAllCategories" class="text-xs text-stone-400 hover:text-stone-700">
+                            Zurücksetzen
+                        </button>
+                    @endif
+
+                    <!-- Direkter Link zur Kategorientabelle -->
+                    <a href="{{ route('categories.index') }}" target="_blank" 
+                       class="inline-flex items-center space-x-1 px-2.5 py-1 text-xs font-semibold text-[#8ea92c] bg-[#8ea92c]/10 hover:bg-[#8ea92c]/20 rounded-md transition" 
+                       title="Öffnet die Kategorientabelle in einem neuen Tab zum Anpassen">
+                        <span class="material-symbols-outlined text-sm">tune</span>
+                        <span>Kategorientabelle verwalten</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Klickbare Kategorie-Chips mit direktem Umschalten -->
+            <div class="flex flex-wrap gap-2 pt-1 max-h-56 overflow-y-auto p-1 scrollbar-thin">
+                @forelse ($categories as $cat)
+                    @php
+                        $isSelected = in_array($cat->id, $selectedCategoryIds, true);
+                    @endphp
+                    <button type="button" 
+                            wire:click="toggleCategory('{{ $cat->id }}')" 
+                            class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition cursor-pointer select-none {{ $isSelected ? 'bg-[#8ea92c] border-[#8ea92c] text-white shadow-xs font-semibold' : 'bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100 hover:border-stone-300' }}">
+                        <span class="w-2 h-2 rounded-full" style="background-color: {{ $isSelected ? '#ffffff' : ($cat->color ?? '#8ea92c') }};"></span>
                         <span>{{ $cat->name }}</span>
-                    </label>
-                @endforeach
+                        @if ($isSelected)
+                            <span class="material-symbols-outlined text-xs leading-none">check</span>
+                        @endif
+                    </button>
+                @empty
+                    <p class="text-xs text-stone-400 italic py-2">
+                        Keine Kategorien für "{{ $categorySearch }}" gefunden.
+                    </p>
+                @endforelse
             </div>
         </div>
 
@@ -225,7 +264,47 @@
             </button>
         </div>
 
-        <!-- 5. Notizen & Quelle -->
+        <!-- 5. Nährwerte (pro Portion) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-stone-100 pb-2">
+                <h2 class="text-base font-bold text-stone-900 flex items-center space-x-2">
+                    <span class="material-symbols-outlined text-[#8ea92c]">nutrition</span>
+                    <span>Nährwerte (pro Portion)</span>
+                </h2>
+                <span class="text-xs text-stone-400 font-normal">Optional</span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">Energie (kcal)</label>
+                    <input wire:model="calories" type="number" min="0" placeholder="z. B. 580"
+                           class="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-2 focus:ring-[#8ea92c] focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">Eiweiß / Protein (g)</label>
+                    <input wire:model="protein" type="number" step="0.1" min="0" placeholder="z. B. 33"
+                           class="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-2 focus:ring-[#8ea92c] focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">Fett (g)</label>
+                    <input wire:model="fat" type="number" step="0.1" min="0" placeholder="z. B. 24"
+                           class="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-2 focus:ring-[#8ea92c] focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">Kohlenhydrate (g)</label>
+                    <input wire:model="carbohydrates" type="number" step="0.1" min="0" placeholder="z. B. 40"
+                           class="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-2 focus:ring-[#8ea92c] focus:outline-none">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-stone-700 mb-1">Zusätzliche Nährwert-Angaben</label>
+                <textarea wire:model="nutrition_raw" rows="2" placeholder="z. B. Ballaststoffe: 5g, Zucker: 3g..."
+                          class="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-2 focus:ring-[#8ea92c] focus:outline-none"></textarea>
+            </div>
+        </div>
+
+        <!-- 6. Notizen & Quelle -->
         <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 space-y-4">
             <h2 class="text-base font-bold text-stone-900 border-b border-stone-100 pb-2 flex items-center space-x-2">
                 <span class="material-symbols-outlined text-brand-600">sticky_note_2</span>

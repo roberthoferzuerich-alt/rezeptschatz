@@ -126,6 +126,9 @@ class CookmateImportService
                     }
                 }
 
+                // Nährwerte parsen
+                $nutrition = $this->extractNutrition($node->nutrition ?? null);
+
                 // Rezept anlegen
                 $recipe = Recipe::create([
                     'id' => $recipeId,
@@ -136,6 +139,11 @@ class CookmateImportService
                     'prep_time_minutes' => $prepTime,
                     'cook_time_minutes' => $cookTime,
                     'rest_time_minutes' => $restTime,
+                    'calories' => $nutrition['calories'],
+                    'carbohydrates' => $nutrition['carbohydrates'],
+                    'fat' => $nutrition['fat'],
+                    'protein' => $nutrition['protein'],
+                    'nutrition_raw' => $nutrition['nutrition_raw'],
                     'notes' => $notes ?: null,
                     'source_url' => $sourceUrl ? mb_substr($sourceUrl, 0, 1000) : null,
                     'is_favorite' => ((int)$node->rating >= 4),
@@ -383,6 +391,75 @@ class CookmateImportService
         }
 
         return null;
+    }
+
+    public function extractNutrition(?\SimpleXMLElement $node): array
+    {
+        if (!$node) {
+            return [
+                'calories' => null,
+                'carbohydrates' => null,
+                'fat' => null,
+                'protein' => null,
+                'nutrition_raw' => null,
+            ];
+        }
+
+        $items = $this->extractListItems($node);
+        $calories = null;
+        $carbs = null;
+        $fat = null;
+        $protein = null;
+        $rawLines = [];
+
+        foreach ($items as $item) {
+            $line = trim($item);
+            if (empty($line)) continue;
+            $rawLines[] = $line;
+
+            // Kalorien
+            if ($calories === null && preg_match('/(?:kcal|calories?|kalorien)\s*[:=]?\s*(\d+)|(\d+)\s*(?:kcal|kKalorien|Kalorien)/i', $line, $m)) {
+                $val = (!empty($m[1])) ? $m[1] : ($m[2] ?? '');
+                if (is_numeric($val)) {
+                    $calories = (int)$val;
+                }
+            }
+
+            // Fett
+            if ($fat === null && preg_match('/(?:fat|fett|fatcontent)\s*[:=]?\s*([\d\.,]+)\s*g?|([\d\.,]+)\s*g\s*fett/i', $line, $m)) {
+                $rawVal = (!empty($m[1])) ? $m[1] : ($m[2] ?? '');
+                $val = str_replace(',', '.', $rawVal);
+                if (is_numeric($val)) {
+                    $fat = (float)$val;
+                }
+            }
+
+            // Kohlenhydrate
+            if ($carbs === null && preg_match('/(?:carbohydrate|kohlenhydrat|carbohydratecontent|carbs)\w*\s*[:=]?\s*([\d\.,]+)\s*g?|([\d\.,]+)\s*g\s*kohlenhydrat/i', $line, $m)) {
+                $rawVal = (!empty($m[1])) ? $m[1] : ($m[2] ?? '');
+                $val = str_replace(',', '.', $rawVal);
+                if (is_numeric($val)) {
+                    $carbs = (float)$val;
+                }
+            }
+
+            // Eiweiß / Protein
+            if ($protein === null && preg_match('/(?:protein|eiweis|eiweiss|proteincontent)\w*\s*[:=]?\s*([\d\.,]+)\s*g?|([\d\.,]+)\s*g\s*eiweis/i', $line, $m)) {
+                $rawVal = (!empty($m[1])) ? $m[1] : ($m[2] ?? '');
+                $val = str_replace(',', '.', $rawVal);
+                if (is_numeric($val)) {
+                    $protein = (float)$val;
+                }
+            }
+        }
+
+        return [
+            'calories' => $calories,
+            'carbohydrates' => $carbs,
+            'fat' => $fat,
+            'protein' => $protein,
+            'nutrition_raw' => !empty($rawLines) ? implode("\n", $rawLines) : null,
+        ];
     }
 }
 

@@ -30,6 +30,11 @@ class RecipeService
             $recipe->prep_time_minutes = isset($data['prep_time_minutes']) ? (int) $data['prep_time_minutes'] : null;
             $recipe->cook_time_minutes = isset($data['cook_time_minutes']) ? (int) $data['cook_time_minutes'] : null;
             $recipe->rest_time_minutes = isset($data['rest_time_minutes']) ? (int) $data['rest_time_minutes'] : null;
+            $recipe->calories = isset($data['calories']) && is_numeric($data['calories']) ? (int) $data['calories'] : null;
+            $recipe->carbohydrates = isset($data['carbohydrates']) && is_numeric($data['carbohydrates']) ? (float) $data['carbohydrates'] : null;
+            $recipe->fat = isset($data['fat']) && is_numeric($data['fat']) ? (float) $data['fat'] : null;
+            $recipe->protein = isset($data['protein']) && is_numeric($data['protein']) ? (float) $data['protein'] : null;
+            $recipe->nutrition_raw = $data['nutrition_raw'] ?? null;
             $recipe->notes = $data['notes'] ?? null;
             $recipe->source_url = $data['source_url'] ?? null;
             $recipe->is_favorite = (bool) ($data['is_favorite'] ?? false);
@@ -100,6 +105,11 @@ class RecipeService
             $recipe->prep_time_minutes = array_key_exists('prep_time_minutes', $data) ? (isset($data['prep_time_minutes']) ? (int) $data['prep_time_minutes'] : null) : $recipe->prep_time_minutes;
             $recipe->cook_time_minutes = array_key_exists('cook_time_minutes', $data) ? (isset($data['cook_time_minutes']) ? (int) $data['cook_time_minutes'] : null) : $recipe->cook_time_minutes;
             $recipe->rest_time_minutes = array_key_exists('rest_time_minutes', $data) ? (isset($data['rest_time_minutes']) ? (int) $data['rest_time_minutes'] : null) : $recipe->rest_time_minutes;
+            $recipe->calories = array_key_exists('calories', $data) ? (isset($data['calories']) && is_numeric($data['calories']) ? (int) $data['calories'] : null) : $recipe->calories;
+            $recipe->carbohydrates = array_key_exists('carbohydrates', $data) ? (isset($data['carbohydrates']) && is_numeric($data['carbohydrates']) ? (float) $data['carbohydrates'] : null) : $recipe->carbohydrates;
+            $recipe->fat = array_key_exists('fat', $data) ? (isset($data['fat']) && is_numeric($data['fat']) ? (float) $data['fat'] : null) : $recipe->fat;
+            $recipe->protein = array_key_exists('protein', $data) ? (isset($data['protein']) && is_numeric($data['protein']) ? (float) $data['protein'] : null) : $recipe->protein;
+            $recipe->nutrition_raw = array_key_exists('nutrition_raw', $data) ? $data['nutrition_raw'] : $recipe->nutrition_raw;
             $recipe->notes = array_key_exists('notes', $data) ? $data['notes'] : $recipe->notes;
             $recipe->source_url = array_key_exists('source_url', $data) ? $data['source_url'] : $recipe->source_url;
             if (isset($data['is_shared'])) {

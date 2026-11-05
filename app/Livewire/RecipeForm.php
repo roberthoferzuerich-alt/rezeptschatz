@@ -29,8 +29,30 @@ class RecipeForm extends Component
     public string $source_url = '';
     public bool $is_favorite = false;
 
+    // Nährwerte (pro Portion)
+    public ?int $calories = null;
+    public ?float $carbohydrates = null;
+    public ?float $fat = null;
+    public ?float $protein = null;
+    public ?string $nutrition_raw = null;
+
     // Kategorien
     public array $selectedCategoryIds = [];
+    public string $categorySearch = '';
+
+    public function toggleCategory(string $categoryId): void
+    {
+        if (in_array($categoryId, $this->selectedCategoryIds, true)) {
+            $this->selectedCategoryIds = array_values(array_diff($this->selectedCategoryIds, [$categoryId]));
+        } else {
+            $this->selectedCategoryIds[] = $categoryId;
+        }
+    }
+
+    public function deselectAllCategories(): void
+    {
+        $this->selectedCategoryIds = [];
+    }
 
     // Zutaten (dynamische Zeilen)
     public array $ingredients = [];
@@ -61,6 +83,11 @@ class RecipeForm extends Component
             $this->notes = $recipe->notes ?? '';
             $this->source_url = $recipe->source_url ?? '';
             $this->is_favorite = (bool) $recipe->is_favorite;
+            $this->calories = $recipe->calories;
+            $this->carbohydrates = $recipe->carbohydrates !== null ? (float) $recipe->carbohydrates : null;
+            $this->fat = $recipe->fat !== null ? (float) $recipe->fat : null;
+            $this->protein = $recipe->protein !== null ? (float) $recipe->protein : null;
+            $this->nutrition_raw = $recipe->nutrition_raw;
             $this->existingImagePath = $recipe->image_path;
 
             $this->selectedCategoryIds = $recipe->categories->pluck('id')->toArray();
@@ -142,6 +169,11 @@ class RecipeForm extends Component
             'prep_time_minutes' => ['nullable', 'integer', 'min:0'],
             'cook_time_minutes' => ['nullable', 'integer', 'min:0'],
             'rest_time_minutes' => ['nullable', 'integer', 'min:0'],
+            'calories' => ['nullable', 'integer', 'min:0', 'max:50000'],
+            'carbohydrates' => ['nullable', 'numeric', 'min:0', 'max:5000'],
+            'fat' => ['nullable', 'numeric', 'min:0', 'max:5000'],
+            'protein' => ['nullable', 'numeric', 'min:0', 'max:5000'],
+            'nutrition_raw' => ['nullable', 'string', 'max:5000'],
             'notes' => ['nullable', 'string'],
             'source_url' => ['nullable', 'url', 'max:1000'],
             'is_favorite' => ['boolean'],
@@ -196,6 +228,11 @@ class RecipeForm extends Component
             'prep_time_minutes' => $this->prep_time_minutes,
             'cook_time_minutes' => $this->cook_time_minutes,
             'rest_time_minutes' => $this->rest_time_minutes,
+            'calories' => $this->calories,
+            'carbohydrates' => $this->carbohydrates,
+            'fat' => $this->fat,
+            'protein' => $this->protein,
+            'nutrition_raw' => !empty(trim($this->nutrition_raw ?? '')) ? trim($this->nutrition_raw) : null,
             'notes' => trim($this->notes),
             'source_url' => trim($this->source_url),
             'is_favorite' => $this->is_favorite,
@@ -226,10 +263,15 @@ class RecipeForm extends Component
 
     public function render()
     {
-        $categories = Category::where('user_id', Auth::id())->orderBy('name')->get();
+        $categoryQuery = Category::where('user_id', Auth::id())->orderBy('name');
+        if (!empty(trim($this->categorySearch))) {
+            $categoryQuery->where('name', 'like', '%' . trim($this->categorySearch) . '%');
+        }
+        $categories = $categoryQuery->get();
 
         return view('livewire.recipe-form', [
             'categories' => $categories,
+            'totalCategoriesCount' => Category::where('user_id', Auth::id())->count(),
         ]);
     }
 }

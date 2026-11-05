@@ -122,6 +122,14 @@ class RecipeDetail extends Component
             $categoriesList = $recipe->categories->pluck('name')->join(', ');
             $md .= "- **Kategorien:** {$categoriesList}\n";
         }
+        if ($recipe->calories || $recipe->protein || $recipe->fat || $recipe->carbohydrates) {
+            $md .= "- **Nährwerte (pro Portion):** " . implode(', ', array_filter([
+                $recipe->calories ? "{$recipe->calories} kcal" : null,
+                $recipe->protein ? "{$recipe->protein} g Eiweiß" : null,
+                $recipe->fat ? "{$recipe->fat} g Fett" : null,
+                $recipe->carbohydrates ? "{$recipe->carbohydrates} g Kohlenhydrate" : null,
+            ])) . "\n";
+        }
         $md .= "\n";
 
         // Zutaten

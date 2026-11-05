@@ -23,6 +23,11 @@ class Recipe extends Model
         'prep_time_minutes',
         'cook_time_minutes',
         'rest_time_minutes',
+        'calories',
+        'carbohydrates',
+        'fat',
+        'protein',
+        'nutrition_raw',
         'notes',
         'source_url',
         'is_favorite',
@@ -41,6 +46,10 @@ class Recipe extends Model
             'prep_time_minutes' => 'integer',
             'cook_time_minutes' => 'integer',
             'rest_time_minutes' => 'integer',
+            'calories' => 'integer',
+            'carbohydrates' => 'float',
+            'fat' => 'float',
+            'protein' => 'float',
             'server_version' => 'integer',
         ];
     }
