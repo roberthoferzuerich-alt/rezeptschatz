@@ -201,13 +201,77 @@ JSON;
     }
 
     /**
-     * Ruft die Google Gemini API mit Bild auf.
+     * Ermittelt das aktive, unterstützte Gemini-Modell für den API-Schlüssel.
+     */
+    public function resolveGeminiModel(string $apiKey): string
+    {
+        $configured = env('GEMINI_MODEL') ?: config('services.gemini.model');
+        if (!empty($configured) && $configured !== 'gemini-1.5-flash') {
+            return str_replace('models/', '', $configured);
+        }
+
+        if ($cached = Cache::get('gemini_active_model')) {
+            return $cached;
+        }
+
+        // Dynamische Abfrage der verfügbaren Modelle für diesen API-Schlüssel
+        try {
+            $resp = Http::withOptions(['verify' => false])
+                ->timeout(8)
+                ->get("https://generativelanguage.googleapis.com/v1beta/models?key={$apiKey}");
+
+            if ($resp->successful()) {
+                $models = $resp->json('models') ?? [];
+                $candidates = [];
+
+                foreach ($models as $m) {
+                    $methods = $m['supportedGenerationMethods'] ?? [];
+                    if (in_array('generateContent', $methods, true)) {
+                        $name = str_replace('models/', '', $m['name'] ?? '');
+                        if (!empty($name)) {
+                            $candidates[] = $name;
+                        }
+                    }
+                }
+
+                // Präferenz für moderne Flash-Modelle
+                $priorities = ['2.5-flash', '2.0-flash', '1.5-flash-latest', 'flash', 'pro'];
+                foreach ($priorities as $prio) {
+                    foreach ($candidates as $cand) {
+                        if (str_contains(strtolower($cand), $prio)) {
+                            Cache::forever('gemini_active_model', $cand);
+                            return $cand;
+                        }
+                    }
+                }
+
+                if (!empty($candidates[0])) {
+                    Cache::forever('gemini_active_model', $candidates[0]);
+                    return $candidates[0];
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Gemini ListModels fehlgeschlagen: " . $e->getMessage());
+        }
+
+        return 'gemini-2.5-flash';
+    }
+
+    /**
+     * Ruft die Google Gemini API mit Bild auf (mit automatischem Modell-Fallback).
      */
     protected function callGeminiVision(string $prompt, string $imageBytes, string $mimeType): array
     {
         $apiKey = $this->getGeminiKey();
-        $model = env('GEMINI_MODEL', 'gemini-1.5-flash');
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+        $primaryModel = $this->resolveGeminiModel($apiKey);
+
+        $modelsToTry = array_unique([
+            $primaryModel,
+            'gemini-2.5-flash',
+            'gemini-2.0-flash',
+            'gemini-1.5-flash-latest',
+            'gemini-1.5-pro',
+        ]);
 
         $payload = [
             'contents' => [
@@ -229,29 +293,49 @@ JSON;
             ],
         ];
 
-        $response = Http::withOptions(['verify' => false])
-            ->timeout(60)
-            ->post($url, $payload);
+        $lastError = null;
+        foreach ($modelsToTry as $model) {
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
-        if (!$response->successful()) {
-            $err = $response->json()['error']['message'] ?? $response->body();
-            Log::error("Gemini Vision Fehler: " . $err);
-            throw new \Exception("Google Gemini Fehler: {$err}");
+            $response = Http::withOptions(['verify' => false])
+                ->timeout(60)
+                ->post($url, $payload);
+
+            if ($response->successful()) {
+                Cache::forever('gemini_active_model', $model);
+                $data = $response->json();
+                $rawJson = $data['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
+                return $this->decodeAndValidateJson($rawJson);
+            }
+
+            $errBody = $response->json()['error']['message'] ?? $response->body();
+            $lastError = "Google Gemini Fehler ({$model}): {$errBody}";
+            Log::warning("Gemini Vision Versuch mit '{$model}' fehlgeschlagen: {$errBody}");
+
+            // Wenn es kein 404/Modell-Fehler ist (z.B. falscher API-Key), sofort werfen
+            if ($response->status() !== 404 && !str_contains($errBody, 'not found')) {
+                throw new \Exception("Google Gemini Fehler: {$errBody}");
+            }
         }
 
-        $data = $response->json();
-        $rawJson = $data['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
-        return $this->decodeAndValidateJson($rawJson);
+        throw new \Exception($lastError ?: 'Google Gemini API-Aufruf fehlgeschlagen.');
     }
 
     /**
-     * Ruft die Google Gemini API rein textbasiert auf.
+     * Ruft die Google Gemini API rein textbasiert auf (mit automatischem Modell-Fallback).
      */
     protected function callGeminiText(string $prompt): array
     {
         $apiKey = $this->getGeminiKey();
-        $model = env('GEMINI_MODEL', 'gemini-1.5-flash');
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+        $primaryModel = $this->resolveGeminiModel($apiKey);
+
+        $modelsToTry = array_unique([
+            $primaryModel,
+            'gemini-2.5-flash',
+            'gemini-2.0-flash',
+            'gemini-1.5-flash-latest',
+            'gemini-1.5-pro',
+        ]);
 
         $payload = [
             'contents' => [
@@ -267,18 +351,30 @@ JSON;
             ],
         ];
 
-        $response = Http::withOptions(['verify' => false])
-            ->timeout(60)
-            ->post($url, $payload);
+        $lastError = null;
+        foreach ($modelsToTry as $model) {
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
-        if (!$response->successful()) {
-            $err = $response->json()['error']['message'] ?? $response->body();
-            throw new \Exception("Google Gemini Fehler: {$err}");
+            $response = Http::withOptions(['verify' => false])
+                ->timeout(60)
+                ->post($url, $payload);
+
+            if ($response->successful()) {
+                Cache::forever('gemini_active_model', $model);
+                $data = $response->json();
+                $rawJson = $data['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
+                return $this->decodeAndValidateJson($rawJson);
+            }
+
+            $errBody = $response->json()['error']['message'] ?? $response->body();
+            $lastError = "Google Gemini Fehler ({$model}): {$errBody}";
+
+            if ($response->status() !== 404 && !str_contains($errBody, 'not found')) {
+                throw new \Exception("Google Gemini Fehler: {$errBody}");
+            }
         }
 
-        $data = $response->json();
-        $rawJson = $data['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
-        return $this->decodeAndValidateJson($rawJson);
+        throw new \Exception($lastError ?: 'Google Gemini API-Aufruf fehlgeschlagen.');
     }
 
     /**
