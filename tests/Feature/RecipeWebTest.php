@@ -242,4 +242,39 @@ class RecipeWebTest extends TestCase
             ->call('toggleCategory', $category->id)
             ->assertSet('selectedCategoryIds', []);
     }
+
+    public function test_user_can_view_print_view_of_recipe(): void
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+
+        $recipe = Recipe::create([
+            'user_id' => $user->id,
+            'title' => 'Print-Zitronenkuchen',
+            'portions' => 8,
+            'prep_time_minutes' => 20,
+            'cook_time_minutes' => 45,
+            'server_version' => 1,
+            'is_shared' => true,
+        ]);
+
+        $recipe->ingredients()->create([
+            'name' => 'Bio-Zitronen',
+            'amount_numeric' => 2,
+            'unit' => 'Stück',
+            'sort_order' => 1,
+        ]);
+
+        $recipe->steps()->create([
+            'step_number' => 1,
+            'instruction' => 'Zitronenschale fein abreiben.',
+        ]);
+
+        $response = $this->actingAs($user)->get("/recipes/{$recipe->id}/print");
+        $response->assertStatus(200);
+        $response->assertSee('Print-Zitronenkuchen');
+        $response->assertSee('2 Stück');
+        $response->assertSee('Bio-Zitronen');
+        $response->assertSee('Zitronenschale fein abreiben.');
+        $response->assertSee('Jetzt drucken');
+    }
 }

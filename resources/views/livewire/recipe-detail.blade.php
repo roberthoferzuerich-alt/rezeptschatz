@@ -21,8 +21,16 @@
                 </button>
             </div>
 
-            <!-- Zusätzliche Aktionen (Bearbeiten, Kopieren, Löschen) -->
+            <!-- Zusätzliche Aktionen (Bearbeiten, Drucken, Kopieren, Löschen) -->
             <div class="flex items-center space-x-2">
+                <!-- Drucken -->
+                <a href="{{ route('recipes.print', $recipe->id) }}" target="_blank"
+                   title="Rezept drucken oder als PDF speichern"
+                   class="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-stone-300 text-stone-700 bg-white hover:bg-stone-50 text-sm font-medium shadow-xs transition cursor-pointer">
+                    <span class="material-symbols-outlined text-base">print</span>
+                    <span class="hidden sm:inline">Drucken</span>
+                </a>
+
                 @if ($canEdit)
                     <a href="{{ route('recipes.edit', $recipe->id) }}" class="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-stone-300 text-stone-700 bg-white hover:bg-stone-50 text-sm font-medium shadow-xs transition">
                         <span class="material-symbols-outlined text-base">edit</span>

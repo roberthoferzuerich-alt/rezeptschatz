@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\RecipeImageController;
+use App\Http\Controllers\RecipePrintController;
 use App\Livewire\AccountSettings;
 use App\Livewire\CategoryManager;
 use App\Livewire\ChatGptCooking;
@@ -34,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/recipes/import-web', WebRecipeImport::class)->name('recipes.import.web');
     Route::get('/recipes/chatgpt', ChatGptCooking::class)->name('recipes.chatgpt');
     Route::get('/recipes/{id}/edit', RecipeForm::class)->name('recipes.edit');
+    Route::get('/recipes/{id}/print', [RecipePrintController::class, 'show'])->name('recipes.print');
     Route::get('/recipes/{id}', RecipeDetail::class)->name('recipes.show');
 
     // Geschützte Bildauslieferung

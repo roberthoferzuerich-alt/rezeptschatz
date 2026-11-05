@@ -27,4 +27,5 @@ Homestead.yaml
 Thumbs.db
 *.mcb
 *.zip
+*.sql
 /public/download/
