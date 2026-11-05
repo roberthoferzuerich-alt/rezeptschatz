@@ -44,7 +44,7 @@ class LoginController extends Controller
             ]);
         }
 
-        $remember = $request->boolean('remember');
+        $remember = $request->boolean('remember', true);
 
         if (Auth::attempt($credentials, $remember)) {
             RateLimiter::clear($throttleKey);

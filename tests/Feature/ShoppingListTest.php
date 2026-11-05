@@ -157,3 +157,4 @@ class ShoppingListTest extends TestCase
         $this->assertDatabaseMissing('shopping_list_items', ['name' => 'Erledigter Artikel']);
     }
 }
+

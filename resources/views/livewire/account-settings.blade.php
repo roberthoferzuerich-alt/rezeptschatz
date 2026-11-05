@@ -345,6 +345,26 @@
                                 <span>Präferenzen speichern</span>
                             </button>
                         </div>
+
+                        <!-- Tablet App Anleitung -->
+                        <div class="pt-6 border-t border-stone-200 space-y-3">
+                            <h4 class="text-sm font-bold text-stone-900 flex items-center space-x-2">
+                                <span class="material-symbols-outlined text-[#8ea92c]">tablet_android</span>
+                                <span>Als App auf dem Samsung Tablet einrichten</span>
+                            </h4>
+                            <div class="bg-stone-50 p-4 rounded-xl border border-stone-200 text-xs text-stone-700 space-y-2">
+                                <p class="font-semibold text-stone-800">In 3 einfachen Schritten auf dem Startbildschirm installieren:</p>
+                                <ol class="list-decimal list-inside space-y-1.5 text-stone-600">
+                                    <li>Öffnen Sie auf dem Tablet im Browser Ihre Adresse: <span class="font-bold text-[#8ea92c]">https://rhz.internet-box.ch:8449</span></li>
+                                    <li>Melden Sie sich einmalig an (das Häkchen bei <strong>„Angemeldet bleiben“</strong> ist automatisch gesetzt).</li>
+                                    <li>Tippen Sie im Browser oben rechts auf die <strong>drei Punkte (⋮)</strong> und wählen Sie:  
+                                        👉 <strong>„App installieren“</strong> bzw. <strong>„Zum Startbildschirm hinzufügen“</strong>.</li>
+                                </ol>
+                                <p class="text-[11px] text-stone-500 pt-1">
+                                    ✨ Danach erscheint das Rezeptschatz-App-Icon auf Ihrem Startbildschirm und startet die App im Vollbildmodus – genau wie eine native Android-App aus dem Play Store!
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             @endif

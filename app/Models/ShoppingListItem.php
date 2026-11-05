@@ -57,3 +57,4 @@ class ShoppingListItem extends Model
         return $this->unit ?? '';
     }
 }
+

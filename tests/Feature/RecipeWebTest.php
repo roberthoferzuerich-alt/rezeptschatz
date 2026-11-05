@@ -23,7 +23,7 @@ class RecipeWebTest extends TestCase
     {
         $response = $this->get('/login');
         $response->assertStatus(200);
-        $response->assertSee('Rezeptbuch');
+        $response->assertSee('Rezeptschatz');
     }
 
     public function test_user_can_login_with_valid_credentials(): void

@@ -28,7 +28,7 @@
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-500/10 text-brand-600 mb-3">
                 <span class="material-symbols-outlined text-4xl">menu_book</span>
             </div>
-            <h2 class="text-3xl font-bold tracking-tight text-stone-900">Rezeptbuch</h2>
+            <h2 class="text-3xl font-bold tracking-tight text-stone-900">Rezeptschatz</h2>
             <p class="mt-2 text-sm text-stone-600">Private Rezeptverwaltung</p>
         </div>
 
@@ -62,8 +62,8 @@
 
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
-                    <input id="remember" name="remember" type="checkbox" class="h-4 w-4 text-brand-600 focus:ring-brand-500 border-stone-300 rounded">
-                    <label for="remember" class="ml-2 block text-sm text-stone-700">Angemeldet bleiben</label>
+                    <input id="remember" name="remember" type="checkbox" checked class="h-4 w-4 text-[#8ea92c] focus:ring-[#8ea92c] border-stone-300 rounded">
+                    <label for="remember" class="ml-2 block text-sm text-stone-700">Angemeldet bleiben (dauerhaft)</label>
                 </div>
             </div>
 

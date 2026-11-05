@@ -42,3 +42,4 @@ class MealPlan extends Model
         return $this->recipe ? $this->recipe->title : ($this->custom_title ?: 'Geplantes Gericht');
     }
 }
+

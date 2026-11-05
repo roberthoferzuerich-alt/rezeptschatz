@@ -167,3 +167,4 @@ class ShoppingListService
         return 'Sonstiges';
     }
 }
+
