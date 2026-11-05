@@ -9,10 +9,19 @@
                 Erfassen Sie alle Zutaten, Zubereitungsschritte und Details.
             </p>
         </div>
-        <a href="{{ $isEditing ? route('recipes.show', $recipeId) : route('recipes.index') }}" 
-           class="px-4 py-2 text-sm text-stone-600 hover:text-stone-900 border border-stone-300 rounded-lg hover:bg-stone-50 transition">
-            Abbrechen
-        </a>
+        <div class="flex items-center gap-2">
+            @if (!$isEditing)
+                <a href="{{ route('recipes.scan') }}" 
+                   class="inline-flex items-center px-3.5 py-2 text-xs font-bold text-white bg-[#8ea92c] hover:bg-[#7e9626] rounded-xl shadow-sm transition">
+                    <span class="material-symbols-outlined text-base mr-1.5">document_scanner</span>
+                    <span>Rezept scannen</span>
+                </a>
+            @endif
+            <a href="{{ $isEditing ? route('recipes.show', $recipeId) : route('recipes.index') }}" 
+               class="px-4 py-2 text-sm text-stone-600 hover:text-stone-900 border border-stone-300 rounded-xl hover:bg-stone-50 transition">
+                Abbrechen
+            </a>
+        </div>
     </div>
 
     @if ($errors->any())

@@ -362,13 +362,17 @@
                         Scan verwerfen & neu starten
                     </button>
 
-                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-                        <a href="{{ route('recipes.index') }}" class="px-4 py-2 border border-stone-300 text-stone-700 hover:bg-stone-50 text-sm font-semibold rounded-xl transition">
+                    <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
+                        <a href="{{ route('recipes.index') }}" class="px-4 py-2.5 border border-stone-300 text-stone-700 hover:bg-stone-50 text-sm font-semibold rounded-xl transition">
                             Abbrechen
                         </a>
+                        <button type="button" wire:click="editInEditor" class="inline-flex items-center px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-800 text-sm font-semibold rounded-xl border border-stone-300 transition">
+                            <span class="material-symbols-outlined text-base mr-1.5 text-stone-600">edit_note</span>
+                            <span>Im Editor weiterbearbeiten</span>
+                        </button>
                         <button type="button" wire:click="saveRecipe" class="inline-flex items-center px-6 py-2.5 bg-[#8ea92c] hover:bg-[#7e9626] text-white text-sm font-bold rounded-xl shadow transition">
                             <span class="material-symbols-outlined text-lg mr-1.5">save</span>
-                            <span>Als Rezept speichern</span>
+                            <span>Direkt speichern</span>
                         </button>
                     </div>
                 </div>
@@ -379,3 +383,4 @@
     @endif
 
 </div>
+

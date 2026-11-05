@@ -40,6 +40,10 @@ class RecipeService
             $recipe->is_favorite = (bool) ($data['is_favorite'] ?? false);
             $recipe->is_shared = isset($data['is_shared']) ? (bool) $data['is_shared'] : true;
             $recipe->server_version = (int) ($data['server_version'] ?? 1);
+            if (!empty($data['image_path'])) {
+                $recipe->image_path = $data['image_path'];
+                $recipe->image_hash = $data['image_hash'] ?? null;
+            }
             $recipe->save();
 
             // Wenn Favorit gewählt, auch in recipe_favorites eintragen

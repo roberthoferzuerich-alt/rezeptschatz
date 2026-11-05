@@ -144,6 +144,39 @@ class RecipeForm extends Component
                     ];
                 }
             }
+        } elseif (session()->has('imported_scanned_recipe')) {
+            $scanned = session('imported_scanned_recipe');
+            $this->title = $scanned['title'] ?? '';
+            $this->description = $scanned['description'] ?? '';
+            $this->portions = (int) ($scanned['portions'] ?? 4);
+            $this->prep_time_minutes = $scanned['prep_time_minutes'] ?? null;
+            $this->cook_time_minutes = $scanned['cook_time_minutes'] ?? null;
+            $this->existingImagePath = $scanned['image_path'] ?? null;
+
+            if (!empty($scanned['ingredients'])) {
+                foreach ($scanned['ingredients'] as $ing) {
+                    $this->ingredients[] = [
+                        'id' => null,
+                        'name' => $ing['name'] ?? '',
+                        'amount_numeric' => $ing['amount_numeric'] ?? '',
+                        'unit' => $ing['unit'] ?? '',
+                        'amount_text' => $ing['amount_text'] ?? '',
+                        'group_name' => '',
+                    ];
+                }
+            }
+
+            if (!empty($scanned['steps'])) {
+                foreach ($scanned['steps'] as $st) {
+                    $this->steps[] = [
+                        'id' => null,
+                        'instruction' => $st['instruction'] ?? '',
+                    ];
+                }
+            }
+
+            // Automatische Kategorien-Zuordnung aus den gescannten Zutaten
+            $this->autoSelectCategoriesFromScanned();
         }
 
         // Falls neu oder leer: Standardzeilen anlegen
@@ -278,6 +311,8 @@ class RecipeForm extends Component
 
         if ($this->newImage) {
             $payload['image'] = $this->newImage;
+        } elseif ($this->existingImagePath && !$this->isEditing) {
+            $payload['image_path'] = $this->existingImagePath;
         } elseif ($this->removeExistingImage) {
             $payload['remove_image'] = true;
         }
@@ -294,6 +329,40 @@ class RecipeForm extends Component
         }
 
         return $this->redirectRoute('recipes.show', $recipe->id, navigate: true);
+    }
+
+    protected function autoSelectCategoriesFromScanned(): void
+    {
+        $allText = mb_strtolower($this->title . ' ' . implode(' ', array_column($this->ingredients, 'name')));
+
+        $rules = [
+            'Fleisch' => ['rind', 'schwein', 'kalb', 'hackfleisch', 'speck', 'schinken', 'bratwurst', 'geschnetzelt', 'fleisch'],
+            'Geflügel' => ['poulet', 'hähnchen', 'huhn', 'trute', 'truthahn', 'geflügel', 'ente'],
+            'Fisch' => ['fisch', 'lachs', 'thunfisch', 'forelle', 'dorsch', 'crevette', 'garnele', 'meeresfrüchte'],
+            'Teigwaren' => ['teigwaren', 'nudel', 'pasta', 'spaghetti', 'penne', 'spätzli', 'lasagne'],
+            'Reis' => ['reis', 'risotto', 'basmati'],
+            'Kartoffel' => ['kartoffel', 'gschwellti', 'härdöpfel'],
+            'Gemüse' => ['gemüse', 'rüebli', 'karotte', 'zucchetti', 'peperoni', 'spinat', 'broccoli', 'blumenkohl', 'lauch'],
+            'Pilz' => ['pilz', 'champignon', 'steinpilz', 'morchel', 'pfifferling'],
+            'Käse' => ['käse', 'gruyère', 'parmesan', 'mozzarella', 'raclette'],
+        ];
+
+        $user = Auth::user();
+        if (! $user) {
+            return;
+        }
+
+        foreach ($rules as $catName => $keywords) {
+            foreach ($keywords as $kw) {
+                if (str_contains($allText, $kw)) {
+                    $cat = Category::where('user_id', $user->id)->where('name', $catName)->first();
+                    if ($cat && ! in_array($cat->id, $this->selectedCategoryIds, true)) {
+                        $this->selectedCategoryIds[] = $cat->id;
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     public function render()

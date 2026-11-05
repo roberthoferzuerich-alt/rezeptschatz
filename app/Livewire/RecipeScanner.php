@@ -246,6 +246,39 @@ class RecipeScanner extends Component
     }
 
     /**
+     * Übergibt das gescannte Rezept in den vollständigen Rezept-Editor (RecipeForm).
+     */
+    public function editInEditor()
+    {
+        if (! $this->isParsed) {
+            $this->errorMessage = 'Bitte analysieren Sie das Rezept zuerst.';
+            return;
+        }
+
+        $imagePath = null;
+        if ($this->imageFile) {
+            $tempId = (string) Str::uuid();
+            $targetFilename = "recipes/{$tempId}.jpg";
+            $imageContents = file_get_contents($this->imageFile->getRealPath());
+            Storage::disk('local')->put($targetFilename, $imageContents);
+            $imagePath = $targetFilename;
+        }
+
+        session()->flash('imported_scanned_recipe', [
+            'title' => $this->title,
+            'description' => $this->description,
+            'portions' => $this->portions,
+            'prep_time_minutes' => $this->prep_time_minutes,
+            'cook_time_minutes' => $this->cook_time_minutes,
+            'image_path' => $imagePath,
+            'ingredients' => $this->ingredients,
+            'steps' => $this->steps,
+        ]);
+
+        return redirect()->route('recipes.create');
+    }
+
+    /**
      * Weist dem neu erstellten Rezept automatisch passende Kategorien zu.
      */
     protected function assignCategoriesAutomatically(Recipe $recipe, User $user): void

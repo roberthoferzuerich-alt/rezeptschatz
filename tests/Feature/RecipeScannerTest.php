@@ -114,4 +114,39 @@ TEXT;
         $this->assertContains('Fleisch', $catNames);
         $this->assertContains('Gemüse', $catNames);
     }
+
+    public function test_scanner_can_redirect_to_recipe_form_with_prefilled_data(): void
+    {
+        $user = User::factory()->create();
+
+        $text = <<<TEXT
+Polenta Ticinese
+Traditionelles Tessiner Maisgericht
+Für 4 Personen
+
+Zutaten:
+- 300 g Grobe Polenta
+- 1 Liter Wasser
+- 1 TL Salz
+
+Zubereitung:
+1. Wasser mit Salz aufkochen.
+2. Polenta einrühren und unter ständigem Rühren ca. 45 Minuten garen.
+TEXT;
+
+        Livewire::actingAs($user)
+            ->test(RecipeScanner::class)
+            ->set('rawText', $text)
+            ->call('parseText')
+            ->call('editInEditor')
+            ->assertRedirect(route('recipes.create'));
+
+        // Jetzt den Rezept-Editor (RecipeForm) öffnen
+        Livewire::actingAs($user)
+            ->test(\App\Livewire\RecipeForm::class)
+            ->assertSet('title', 'Polenta Ticinese')
+            ->assertSet('portions', 4)
+            ->assertCount('ingredients', 3)
+            ->assertCount('steps', 2);
+    }
 }
