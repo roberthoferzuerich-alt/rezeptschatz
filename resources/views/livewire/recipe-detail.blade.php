@@ -178,9 +178,18 @@
                 <div class="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
                     <!-- Zutaten -->
                     <div class="lg:col-span-5 space-y-4">
-                        <div class="flex items-center space-x-2 border-b-2 border-[#8ea92c] pb-2">
-                            <span class="material-symbols-outlined text-[#8ea92c]">kitchen</span>
-                            <h2 class="text-lg font-bold text-stone-900">Zutaten</h2>
+                        <div class="flex items-center justify-between border-b-2 border-[#8ea92c] pb-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="material-symbols-outlined text-[#8ea92c]">kitchen</span>
+                                <h2 class="text-lg font-bold text-stone-900">Zutaten</h2>
+                            </div>
+                            <!-- Button zur Einkaufsliste -->
+                            <button type="button" wire:click="addToShoppingList" 
+                                    class="inline-flex items-center space-x-1 px-2.5 py-1 bg-[#8ea92c]/10 hover:bg-[#8ea92c] text-[#8ea92c] hover:text-white rounded-lg text-xs font-semibold transition cursor-pointer print:hidden" 
+                                    title="Zutaten für {{ $currentPortions }} Portionen zur Einkaufsliste hinzufügen">
+                                <span class="material-symbols-outlined text-sm">add_shopping_cart</span>
+                                <span>Auf Einkaufsliste</span>
+                            </button>
                         </div>
 
                         @php

@@ -89,6 +89,21 @@ class RecipeDetail extends Component
         }
     }
 
+    public function addToShoppingList(\App\Services\ShoppingListService $shoppingListService): void
+    {
+        $user = Auth::user();
+        $recipe = Recipe::with('ingredients')
+            ->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhere('is_shared', true);
+            })
+            ->findOrFail($this->recipeId);
+
+        $count = $shoppingListService->addRecipeIngredients($user, $recipe, $this->currentPortions);
+
+        session()->flash('success', "{$count} Zutaten für {$this->currentPortions} Portionen wurden zur Einkaufsliste hinzugefügt!");
+    }
+
     public function getMarkdownContentProperty(): string
     {
         $user = Auth::user();

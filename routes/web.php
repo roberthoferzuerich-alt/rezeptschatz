@@ -6,10 +6,12 @@ use App\Http\Controllers\RecipePrintController;
 use App\Livewire\AccountSettings;
 use App\Livewire\CategoryManager;
 use App\Livewire\ChatGptCooking;
+use App\Livewire\MealPlanner;
 use App\Livewire\RecipeDetail;
 use App\Livewire\RecipeForm;
 use App\Livewire\RecipeImport;
 use App\Livewire\RecipeList;
+use App\Livewire\ShoppingList;
 use App\Livewire\WebRecipeImport;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +45,10 @@ Route::middleware('auth')->group(function () {
 
     // Kategorien
     Route::get('/categories', CategoryManager::class)->name('categories.index');
+
+    // Einkaufsliste & Menüplaner
+    Route::get('/shopping-list', ShoppingList::class)->name('shopping-list.index');
+    Route::get('/meal-planner', MealPlanner::class)->name('meal-planner.index');
 
     // Benutzerkonto & Einstellungen ("Dein Konto")
     Route::get('/account', AccountSettings::class)->name('account.index');

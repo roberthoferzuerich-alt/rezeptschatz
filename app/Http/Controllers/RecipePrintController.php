@@ -25,3 +25,4 @@ class RecipePrintController extends Controller
         ]);
     }
 }
+

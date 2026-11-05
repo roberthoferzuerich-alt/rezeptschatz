@@ -155,12 +155,12 @@
                     </div>
 
                     <!-- 3. Einkaufsliste -->
-                    <a href="{{ route('account.index', ['tab' => 'help']) }}" class="hover:text-stone-900 transition flex items-center space-x-1" title="Einkaufsliste">
+                    <a href="{{ route('shopping-list.index') }}" class="hover:text-stone-900 transition flex items-center space-x-1 {{ request()->routeIs('shopping-list.*') ? 'text-[#8ea92c] font-bold' : '' }}" title="Einkaufsliste">
                         <span>Einkaufsliste</span>
                     </a>
 
                     <!-- 4. Menüplaner -->
-                    <a href="{{ route('account.index', ['tab' => 'help']) }}" class="hover:text-stone-900 transition flex items-center space-x-1" title="Menüplaner">
+                    <a href="{{ route('meal-planner.index') }}" class="hover:text-stone-900 transition flex items-center space-x-1 {{ request()->routeIs('meal-planner.*') ? 'text-[#8ea92c] font-bold' : '' }}" title="Menüplaner">
                         <span>Menüplaner</span>
                     </a>
 
@@ -362,6 +362,14 @@
                 <a href="{{ route('recipes.import') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100 flex items-center justify-between text-stone-800">
                     <span>COOKmate-Backup importieren</span>
                     <span class="material-symbols-outlined text-stone-400 text-base">folder_zip</span>
+                </a>
+                <a href="{{ route('shopping-list.index') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100 flex items-center justify-between text-stone-800 font-semibold">
+                    <span>Einkaufsliste</span>
+                    <span class="material-symbols-outlined text-[#8ea92c] text-base">shopping_cart</span>
+                </a>
+                <a href="{{ route('meal-planner.index') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100 flex items-center justify-between text-stone-800 font-semibold">
+                    <span>Wochen-Menüplaner</span>
+                    <span class="material-symbols-outlined text-[#8ea92c] text-base">calendar_month</span>
                 </a>
                 <a href="{{ route('categories.index') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100">Kategorien</a>
             </div>
