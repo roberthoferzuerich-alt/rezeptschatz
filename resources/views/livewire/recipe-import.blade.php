@@ -17,6 +17,18 @@
         </a>
     </div>
 
+    <!-- Reiter (Tabs) zwischen Web-URL und COOKmate-Datei -->
+    <div class="flex border-b border-stone-200 text-sm font-medium">
+        <a href="{{ route('recipes.import.web') }}" class="py-2.5 px-4 text-stone-500 hover:text-stone-800 transition flex items-center space-x-2 border-b-2 border-transparent">
+            <span class="material-symbols-outlined text-base">link</span>
+            <span>Webseite (URL)</span>
+        </a>
+        <button type="button" class="py-2.5 px-4 border-b-2 border-[#8ea92c] text-[#8ea92c] font-bold flex items-center space-x-2">
+            <span class="material-symbols-outlined text-base">folder_zip</span>
+            <span>COOKmate-Backup (.mcb)</span>
+        </button>
+    </div>
+
     <!-- Fehlermeldung -->
     @if ($errorMessage)
         <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start space-x-3">

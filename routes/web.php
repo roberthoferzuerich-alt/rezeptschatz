@@ -9,6 +9,7 @@ use App\Livewire\RecipeDetail;
 use App\Livewire\RecipeForm;
 use App\Livewire\RecipeImport;
 use App\Livewire\RecipeList;
+use App\Livewire\WebRecipeImport;
 use Illuminate\Support\Facades\Route;
 
 // Gäste-Routen (Login)
@@ -30,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/recipes', RecipeList::class)->name('recipes.index');
     Route::get('/recipes/create', RecipeForm::class)->name('recipes.create');
     Route::get('/recipes/import', RecipeImport::class)->name('recipes.import');
+    Route::get('/recipes/import-web', WebRecipeImport::class)->name('recipes.import.web');
     Route::get('/recipes/chatgpt', ChatGptCooking::class)->name('recipes.chatgpt');
     Route::get('/recipes/{id}/edit', RecipeForm::class)->name('recipes.edit');
     Route::get('/recipes/{id}', RecipeDetail::class)->name('recipes.show');

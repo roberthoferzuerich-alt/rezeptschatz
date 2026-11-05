@@ -297,4 +297,41 @@ class RecipeService
         $recipe->image_hash = null;
         $recipe->save();
     }
+
+    /**
+     * Lädt ein Bild von einer externen URL herunter und speichert es privat für das Rezept.
+     */
+    public function saveRecipeImageFromUrl(Recipe $recipe, string $imageUrl): ?string
+    {
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(10)->get($imageUrl);
+            if ($response->successful()) {
+                $bytes = $response->body();
+                if (strlen($bytes) > 0) {
+                    if ($recipe->image_path && Storage::disk('local')->exists($recipe->image_path)) {
+                        Storage::disk('local')->delete($recipe->image_path);
+                    }
+
+                    $parsedPath = parse_url($imageUrl, PHP_URL_PATH);
+                    $ext = strtolower(pathinfo($parsedPath ?? '', PATHINFO_EXTENSION));
+                    if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
+                        $ext = 'jpg';
+                    }
+
+                    $relativePath = "recipes/{$recipe->user_id}/{$recipe->id}.{$ext}";
+                    Storage::disk('local')->put($relativePath, $bytes);
+
+                    $recipe->image_path = $relativePath;
+                    $recipe->image_hash = hash('sha256', $bytes);
+                    $recipe->save();
+
+                    return $relativePath;
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Konnte Rezeptbild nicht von URL herunterladen: {$imageUrl}. Fehler: " . $e->getMessage());
+        }
+
+        return null;
+    }
 }

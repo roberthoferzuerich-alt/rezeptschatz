@@ -109,6 +109,41 @@ class RecipeForm extends Component
                     'instruction' => $step->instruction,
                 ];
             }
+        } elseif (session()->has('imported_web_recipe')) {
+            $imported = session('imported_web_recipe');
+            $this->title = $imported['title'] ?? '';
+            $this->description = $imported['description'] ?? '';
+            $this->portions = (int) ($imported['portions'] ?? 4);
+            $this->prep_time_minutes = $imported['prep_time_minutes'] ?? null;
+            $this->cook_time_minutes = $imported['cook_time_minutes'] ?? null;
+            $this->source_url = $imported['url'] ?? '';
+            $this->calories = $imported['nutrition']['calories'] ?? null;
+            $this->carbohydrates = $imported['nutrition']['carbohydrates'] ?? null;
+            $this->fat = $imported['nutrition']['fat'] ?? null;
+            $this->protein = $imported['nutrition']['protein'] ?? null;
+            $this->nutrition_raw = $imported['nutrition']['raw'] ?? null;
+
+            if (!empty($imported['ingredients'])) {
+                foreach ($imported['ingredients'] as $ing) {
+                    $this->ingredients[] = [
+                        'id' => null,
+                        'name' => $ing['name'] ?? '',
+                        'amount_numeric' => $ing['amount_numeric'] ?? '',
+                        'unit' => $ing['unit'] ?? '',
+                        'amount_text' => $ing['amount_text'] ?? '',
+                        'group_name' => '',
+                    ];
+                }
+            }
+
+            if (!empty($imported['steps'])) {
+                foreach ($imported['steps'] as $st) {
+                    $this->steps[] = [
+                        'id' => null,
+                        'instruction' => $st['instruction'] ?? '',
+                    ];
+                }
+            }
         }
 
         // Falls neu oder leer: Standardzeilen anlegen

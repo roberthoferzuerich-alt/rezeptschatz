@@ -102,7 +102,7 @@
                                 <span>Mit ChatGPT kochen</span>
                                 <span class="text-[10px] uppercase font-bold bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded">KI</span>
                             </a>
-                            <a href="{{ route('recipes.import') }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+                            <a href="{{ route('recipes.import.web') }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
                                 <span>Importiere Rezepte</span>
                                 <span class="text-[10px] uppercase font-bold bg-[#8ea92c]/15 text-[#8ea92c] px-1.5 py-0.5 rounded">Neu</span>
                             </a>
@@ -141,7 +141,11 @@
                              style="display: none;">
                             <div class="h-0.5 bg-[#8ea92c] -mt-2 mb-1 rounded-t"></div>
                             <a href="{{ route('recipes.index') }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
-                                Neues Rezept suchen
+                                Im Rezeptschatz suchen
+                            </a>
+                            <a href="{{ route('recipes.import.web') }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition font-semibold text-stone-800">
+                                <span>Aus dem Internet (URL)</span>
+                                <span class="material-symbols-outlined text-[#8ea92c] text-base">public</span>
                             </a>
                             <a href="{{ route('recipes.index', ['fav' => 1]) }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
                                 <span>Lesezeichen</span>
