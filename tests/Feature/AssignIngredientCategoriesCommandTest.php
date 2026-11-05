@@ -147,3 +147,4 @@ class AssignIngredientCategoriesCommandTest extends TestCase
         $this->assertDatabaseMissing('categories', ['name' => 'Pouletbrust']);
     }
 }
+
