@@ -351,6 +351,18 @@
                     <span class="material-symbols-outlined text-base">add</span>
                     <span>Rezept erstellen</span>
                 </a>
+                <a href="{{ route('recipes.import.web') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100 flex items-center justify-between text-stone-800">
+                    <span>Aus dem Web (URL) importieren</span>
+                    <span class="material-symbols-outlined text-[#8ea92c] text-base">public</span>
+                </a>
+                <a href="{{ route('recipes.chatgpt') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100 flex items-center justify-between text-stone-800">
+                    <span>Mit ChatGPT kochen</span>
+                    <span class="text-[10px] uppercase font-bold bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded">KI</span>
+                </a>
+                <a href="{{ route('recipes.import') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100 flex items-center justify-between text-stone-800">
+                    <span>COOKmate-Backup importieren</span>
+                    <span class="material-symbols-outlined text-stone-400 text-base">folder_zip</span>
+                </a>
                 <a href="{{ route('categories.index') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100">Kategorien</a>
             </div>
 
