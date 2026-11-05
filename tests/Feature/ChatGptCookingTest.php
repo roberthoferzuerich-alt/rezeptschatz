@@ -24,8 +24,8 @@ class ChatGptCookingTest extends TestCase
 
         $response = $this->actingAs($user)->get('/recipes/chatgpt');
         $response->assertStatus(200);
-        $response->assertSee('Mit ChatGPT kochen');
-        $response->assertSee('Welche Zutaten haben Sie im Kühlschrank?');
+        $response->assertSee('Kühlschrank fotografieren');
+        $response->assertSee('KI-API-Schlüssel');
     }
 
     public function test_can_import_chatgpt_response_text(): void
