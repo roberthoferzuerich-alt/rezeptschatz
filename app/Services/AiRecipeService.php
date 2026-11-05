@@ -170,6 +170,7 @@ class AiRecipeService
         if (!empty($extraWishes)) {
             $base .= "- Zusatzwunsch des Benutzers: {$extraWishes}\n";
         }
+        $base .= "- Nährwerte: Schätze realistische Nährwerte pro Portion (Kalorien in kcal, Kohlenhydrate in g, Fett in g, Eiweiss in g).\n";
 
         $base .= "\nAntworte AUSSCHLIESSLICH als valides JSON in exakt diesem Format:\n";
         $base .= <<<'JSON'
@@ -180,6 +181,10 @@ class AiRecipeService
   "portions": 4,
   "prep_time_minutes": 15,
   "cook_time_minutes": 20,
+  "calories": 480,
+  "carbohydrates": 42.0,
+  "fat": 16.5,
+  "protein": 24.0,
   "ingredients": [
     {
       "name": "Zutatenname",
@@ -507,6 +512,10 @@ JSON;
             'portions' => (int) ($decoded['portions'] ?? 4),
             'prep_time_minutes' => isset($decoded['prep_time_minutes']) ? (int) $decoded['prep_time_minutes'] : null,
             'cook_time_minutes' => isset($decoded['cook_time_minutes']) ? (int) $decoded['cook_time_minutes'] : null,
+            'calories' => isset($decoded['calories']) && is_numeric($decoded['calories']) ? (int) round((float) $decoded['calories']) : null,
+            'carbohydrates' => isset($decoded['carbohydrates']) && is_numeric($decoded['carbohydrates']) ? round((float) $decoded['carbohydrates'], 1) : null,
+            'fat' => isset($decoded['fat']) && is_numeric($decoded['fat']) ? round((float) $decoded['fat'], 1) : null,
+            'protein' => isset($decoded['protein']) && is_numeric($decoded['protein']) ? round((float) $decoded['protein'], 1) : null,
             'ingredients' => $decoded['ingredients'] ?? [],
             'steps' => $decoded['steps'] ?? [],
         ];

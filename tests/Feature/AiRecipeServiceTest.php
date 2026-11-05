@@ -34,6 +34,10 @@ class AiRecipeServiceTest extends TestCase
                                         'portions' => 2,
                                         'prep_time_minutes' => 5,
                                         'cook_time_minutes' => 10,
+                                        'calories' => 380,
+                                        'carbohydrates' => 2.5,
+                                        'fat' => 28.0,
+                                        'protein' => 22.0,
                                         'ingredients' => [
                                             ['name' => 'Eier', 'amount_numeric' => 4, 'unit' => 'stk', 'amount_text' => '4 Stk'],
                                             ['name' => 'Gruyère', 'amount_numeric' => 50, 'unit' => 'g', 'amount_text' => '50 g'],
@@ -56,6 +60,10 @@ class AiRecipeServiceTest extends TestCase
 
         $this->assertEquals('Schweizer Omelette mit Tomaten', $result['title']);
         $this->assertEquals(2, $result['portions']);
+        $this->assertEquals(380, $result['calories']);
+        $this->assertEquals(2.5, $result['carbohydrates']);
+        $this->assertEquals(28.0, $result['fat']);
+        $this->assertEquals(22.0, $result['protein']);
         $this->assertContains('Eier', $result['detected_ingredients']);
         $this->assertCount(2, $result['ingredients']);
         $this->assertCount(2, $result['steps']);

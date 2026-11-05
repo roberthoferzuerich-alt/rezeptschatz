@@ -76,5 +76,46 @@ TEXT;
             'instruction' => 'Das Hähnchenbrustfilet in mundgerechte Stücke schneiden.',
         ]);
     }
+
+    public function test_can_save_generated_recipe_with_nutrition(): void
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+
+        $generated = [
+            'title' => 'Cremiges Pilzrisotto',
+            'description' => 'Feines Risotto mit frischen Champignons.',
+            'portions' => 3,
+            'prep_time_minutes' => 10,
+            'cook_time_minutes' => 25,
+            'calories' => 520,
+            'carbohydrates' => 68.5,
+            'fat' => 16.0,
+            'protein' => 12.5,
+            'ingredients' => [
+                ['name' => 'Risottoreis', 'amount_numeric' => 250, 'unit' => 'g', 'amount_text' => '250 g'],
+                ['name' => 'Champignons', 'amount_numeric' => 200, 'unit' => 'g', 'amount_text' => '200 g'],
+            ],
+            'steps' => [
+                ['instruction' => 'Zwiebeln andünsten, Reis zugeben.', 'step_number' => 1],
+                ['instruction' => 'Mit Bouillon ablöschen.', 'step_number' => 2],
+            ],
+        ];
+
+        Livewire::actingAs($user)
+            ->test(ChatGptCooking::class)
+            ->set('generatedRecipe', $generated)
+            ->call('saveGeneratedRecipe')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('recipes', [
+            'user_id' => $user->id,
+            'title' => 'Cremiges Pilzrisotto',
+            'portions' => 3,
+            'calories' => 520,
+            'carbohydrates' => 68.5,
+            'fat' => 16.0,
+            'protein' => 12.5,
+        ]);
+    }
 }
 

@@ -353,22 +353,42 @@
                 </div>
             @endif
 
-            <!-- Kennzahlen -->
-            <div class="flex flex-wrap gap-4 text-xs font-semibold text-stone-700 bg-[#8ea92c]/5 p-3 rounded-xl border border-[#8ea92c]/20">
-                <div class="flex items-center space-x-1">
-                    <span class="material-symbols-outlined text-base text-[#8ea92c]">group</span>
-                    <span>{{ $generatedRecipe['portions'] }} Portionen</span>
-                </div>
-                @if (!empty($generatedRecipe['prep_time_minutes']))
+            <!-- Kennzahlen & Nährwerte -->
+            <div class="flex flex-wrap items-center justify-between gap-3 text-xs font-semibold text-stone-700 bg-[#8ea92c]/5 p-3 rounded-xl border border-[#8ea92c]/20">
+                <div class="flex flex-wrap items-center gap-4">
                     <div class="flex items-center space-x-1">
-                        <span class="material-symbols-outlined text-base text-[#8ea92c]">timer</span>
-                        <span>Vorbereitung: {{ $generatedRecipe['prep_time_minutes'] }} Min.</span>
+                        <span class="material-symbols-outlined text-base text-[#8ea92c]">group</span>
+                        <span>{{ $generatedRecipe['portions'] }} Portionen</span>
                     </div>
-                @endif
-                @if (!empty($generatedRecipe['cook_time_minutes']))
-                    <div class="flex items-center space-x-1">
-                        <span class="material-symbols-outlined text-base text-[#8ea92c]">skillet</span>
-                        <span>Kochzeit: {{ $generatedRecipe['cook_time_minutes'] }} Min.</span>
+                    @if (!empty($generatedRecipe['prep_time_minutes']))
+                        <div class="flex items-center space-x-1">
+                            <span class="material-symbols-outlined text-base text-[#8ea92c]">timer</span>
+                            <span>Vorbereitung: {{ $generatedRecipe['prep_time_minutes'] }} Min.</span>
+                        </div>
+                    @endif
+                    @if (!empty($generatedRecipe['cook_time_minutes']))
+                        <div class="flex items-center space-x-1">
+                            <span class="material-symbols-outlined text-base text-[#8ea92c]">skillet</span>
+                            <span>Kochzeit: {{ $generatedRecipe['cook_time_minutes'] }} Min.</span>
+                        </div>
+                    @endif
+                </div>
+
+                @if (!empty($generatedRecipe['calories']) || !empty($generatedRecipe['protein']) || !empty($generatedRecipe['fat']) || !empty($generatedRecipe['carbohydrates']))
+                    <div class="flex flex-wrap items-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-stone-200/50">
+                        <span class="text-[11px] uppercase tracking-wider text-stone-500 font-bold">Nährwerte / Port.:</span>
+                        @if (!empty($generatedRecipe['calories']))
+                            <span class="bg-amber-100/80 text-amber-900 px-2 py-0.5 rounded-md font-bold">{{ $generatedRecipe['calories'] }} kcal</span>
+                        @endif
+                        @if (!empty($generatedRecipe['carbohydrates']))
+                            <span class="bg-stone-100 text-stone-800 px-2 py-0.5 rounded-md">{{ $generatedRecipe['carbohydrates'] }} g KH</span>
+                        @endif
+                        @if (!empty($generatedRecipe['fat']))
+                            <span class="bg-stone-100 text-stone-800 px-2 py-0.5 rounded-md">{{ $generatedRecipe['fat'] }} g Fett</span>
+                        @endif
+                        @if (!empty($generatedRecipe['protein']))
+                            <span class="bg-emerald-100/80 text-emerald-900 px-2 py-0.5 rounded-md font-bold">{{ $generatedRecipe['protein'] }} g Eiweiss</span>
+                        @endif
                     </div>
                 @endif
             </div>

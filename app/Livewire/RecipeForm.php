@@ -151,6 +151,10 @@ class RecipeForm extends Component
             $this->portions = (int) ($scanned['portions'] ?? 4);
             $this->prep_time_minutes = $scanned['prep_time_minutes'] ?? null;
             $this->cook_time_minutes = $scanned['cook_time_minutes'] ?? null;
+            $this->calories = $scanned['calories'] ?? null;
+            $this->carbohydrates = $scanned['carbohydrates'] ?? null;
+            $this->fat = $scanned['fat'] ?? null;
+            $this->protein = $scanned['protein'] ?? null;
             $this->existingImagePath = $scanned['image_path'] ?? null;
 
             if (!empty($scanned['ingredients'])) {

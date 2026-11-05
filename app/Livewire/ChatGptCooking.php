@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Recipe;
 use App\Models\RecipeIngredient;
 use App\Models\RecipeStep;
+use App\Models\User;
 use App\Services\AiRecipeService;
 use App\Services\CookmateImportService;
 use App\Services\RecipeService;
@@ -202,6 +203,10 @@ class ChatGptCooking extends Component
                 'portions' => (int) ($this->generatedRecipe['portions'] ?? $this->portions),
                 'prep_time_minutes' => $this->generatedRecipe['prep_time_minutes'] ?? null,
                 'cook_time_minutes' => $this->generatedRecipe['cook_time_minutes'] ?? null,
+                'calories' => $this->generatedRecipe['calories'] ?? null,
+                'carbohydrates' => $this->generatedRecipe['carbohydrates'] ?? null,
+                'fat' => $this->generatedRecipe['fat'] ?? null,
+                'protein' => $this->generatedRecipe['protein'] ?? null,
                 'notes' => 'Kreiert mit Kühlschrank-KI am ' . date('d.m.Y'),
                 'ingredients' => $cleanIngredients,
                 'steps' => $cleanSteps,
@@ -250,6 +255,10 @@ class ChatGptCooking extends Component
             'portions' => $this->generatedRecipe['portions'] ?? $this->portions,
             'prep_time_minutes' => $this->generatedRecipe['prep_time_minutes'] ?? null,
             'cook_time_minutes' => $this->generatedRecipe['cook_time_minutes'] ?? null,
+            'calories' => $this->generatedRecipe['calories'] ?? null,
+            'carbohydrates' => $this->generatedRecipe['carbohydrates'] ?? null,
+            'fat' => $this->generatedRecipe['fat'] ?? null,
+            'protein' => $this->generatedRecipe['protein'] ?? null,
             'image_path' => $imagePath,
             'ingredients' => $this->generatedRecipe['ingredients'] ?? [],
             'steps' => $this->generatedRecipe['steps'] ?? [],
