@@ -32,11 +32,11 @@ class WebRecipeImportService
         }
 
         try {
-            $response = Http::withHeaders([
-                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                'Accept-Language' => 'de-CH,de-DE,de;q=0.9,en;q=0.8',
-            ])->timeout(15)->get($url);
+            $options = $this->getHttpOptions();
+            $response = Http::withHeaders($this->getHttpHeaders())
+                ->withOptions($options)
+                ->timeout(15)
+                ->get($url);
 
             if (!$response->successful()) {
                 return [
@@ -48,11 +48,56 @@ class WebRecipeImportService
             $html = $response->body();
             return $this->parseHtml($html, $url);
         } catch (Exception $e) {
+            // Falls cURL Fehler 77 (Zertifikat-Pfad) oder 60 (Zertifikat-Prüfung), Versuch mit verify=false
+            if (str_contains($e->getMessage(), 'cURL error 77') || str_contains($e->getMessage(), 'cURL error 60') || str_contains($e->getMessage(), 'certificate')) {
+                try {
+                    $response = Http::withHeaders($this->getHttpHeaders())
+                        ->withOptions(['verify' => false])
+                        ->timeout(15)
+                        ->get($url);
+
+                    if (!$response->successful()) {
+                        return [
+                            'success' => false,
+                            'error' => "Die Webseite konnte nicht geladen werden (HTTP Status {$response->status()}).",
+                        ];
+                    }
+
+                    $html = $response->body();
+                    return $this->parseHtml($html, $url);
+                } catch (Exception $retryException) {
+                    return [
+                        'success' => false,
+                        'error' => 'Verbindungsfehler beim Abrufen der Webseite: ' . $retryException->getMessage(),
+                    ];
+                }
+            }
+
             return [
                 'success' => false,
                 'error' => 'Verbindungsfehler beim Abrufen der Webseite: ' . $e->getMessage(),
             ];
         }
+    }
+
+    protected function getHttpHeaders(): array
+    {
+        return [
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language' => 'de-CH,de-DE,de;q=0.9,en;q=0.8',
+        ];
+    }
+
+    protected function getHttpOptions(): array
+    {
+        $options = [];
+        $caPath = 'C:/laragon/etc/ssl/cacert.pem';
+        if (file_exists($caPath)) {
+            $options['verify'] = $caPath;
+        }
+
+        return $options;
     }
 
     /**
@@ -573,3 +618,4 @@ class WebRecipeImportService
         return array_values(array_unique($list));
     }
 }
+

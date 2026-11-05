@@ -304,8 +304,20 @@ class RecipeService
     public function saveRecipeImageFromUrl(Recipe $recipe, string $imageUrl): ?string
     {
         try {
-            $response = \Illuminate\Support\Facades\Http::timeout(10)->get($imageUrl);
-            if ($response->successful()) {
+            $options = [];
+            $caPath = 'C:/laragon/etc/ssl/cacert.pem';
+            if (file_exists($caPath)) {
+                $options['verify'] = $caPath;
+            }
+
+            try {
+                $response = \Illuminate\Support\Facades\Http::withOptions($options)->timeout(10)->get($imageUrl);
+            } catch (\Exception $e) {
+                // SSL-Zertifikat Fallback
+                $response = \Illuminate\Support\Facades\Http::withOptions(['verify' => false])->timeout(10)->get($imageUrl);
+            }
+
+            if ($response && $response->successful()) {
                 $bytes = $response->body();
                 if (strlen($bytes) > 0) {
                     if ($recipe->image_path && Storage::disk('local')->exists($recipe->image_path)) {
