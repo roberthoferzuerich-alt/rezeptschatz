@@ -236,11 +236,11 @@ JSON;
                     }
                 }
 
-                // Bevorzuge moderne schnelle Flash-Modelle
-                $priorities = ['3.8-flash', '3.8-pro', 'flash', 'pro'];
+                // Bevorzuge moderne schnelle Flash-Modelle (insbesondere das funktionierende gemini-3-flash-preview)
+                $priorities = ['3-flash-preview', '3.8-flash', '3.7-flash', '3.5-flash', 'flash', 'pro'];
                 foreach ($priorities as $prio) {
                     foreach ($candidates as $cand) {
-                        if (str_contains(strtolower($cand), $prio)) {
+                        if (str_contains(strtolower($cand), $prio) && !str_contains($cand, 'tts') && !str_contains($cand, 'image')) {
                             Cache::forever('gemini_active_model', $cand);
                             return $cand;
                         }
@@ -262,7 +262,7 @@ JSON;
             return str_replace('models/', '', $configured);
         }
 
-        return 'gemini-3.8-flash';
+        return 'gemini-3-flash-preview';
     }
 
     /**
@@ -275,10 +275,10 @@ JSON;
 
         $modelsToTry = array_values(array_unique(array_filter([
             $primaryModel,
+            'gemini-3-flash-preview',
             'gemini-3.8-flash',
-            'gemini-3.8-pro',
-            'gemini-2.5-flash',
-            'gemini-2.5-pro',
+            'gemini-3.7-flash',
+            'gemini-3.5-flash',
         ])));
 
         $payload = [
@@ -350,10 +350,10 @@ JSON;
 
         $modelsToTry = array_values(array_unique(array_filter([
             $primaryModel,
+            'gemini-3-flash-preview',
             'gemini-3.8-flash',
-            'gemini-3.8-pro',
-            'gemini-2.5-flash',
-            'gemini-2.5-pro',
+            'gemini-3.7-flash',
+            'gemini-3.5-flash',
         ])));
 
         $payload = [
