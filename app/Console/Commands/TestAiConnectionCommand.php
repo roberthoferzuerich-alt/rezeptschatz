@@ -90,17 +90,21 @@ class TestAiConnectionCommand extends Command
                 return;
             }
 
+            // Sortiere: Bevorzuge Flash und Standard-Gemini-Modelle, TTS und Previews nach hinten
+            usort($contentModels, function($a, $b) {
+                $scoreA = (str_contains($a, 'flash') ? 20 : 0) + (str_contains($a, 'gemini') ? 10 : 0) - (str_contains($a, 'tts') ? 30 : 0);
+                $scoreB = (str_contains($b, 'flash') ? 20 : 0) + (str_contains($b, 'gemini') ? 10 : 0) - (str_contains($b, 'tts') ? 30 : 0);
+                return $scoreB <=> $scoreA;
+            });
+
             $this->info("Gefundene Modelle mit generateContent (" . count($contentModels) . "):");
             $this->line("  " . implode(', ', $contentModels));
             $this->newLine();
 
-            // 2. Testaufruf an die Kandidaten (mit erzwungenem IPv4 zur Vermeidung von Router/IPv6-Hängern)
-            $curlOptions = defined('CURLOPT_IPRESOLVE') ? [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4] : [];
-
             $success = false;
             foreach ($contentModels as $candidate) {
-                // Bevorzuge moderne Flash- und Pro-Modelle
-                if (str_contains($candidate, 'embedding') || str_contains($candidate, 'aqa')) {
+                // Bevorzuge moderne Text-/Vision-Modelle
+                if (str_contains($candidate, 'embedding') || str_contains($candidate, 'aqa') || str_contains($candidate, 'tts')) {
                     continue;
                 }
 
@@ -111,7 +115,7 @@ class TestAiConnectionCommand extends Command
                     $start = microtime(true);
                     $testResponse = Http::withOptions([
                         'verify' => false,
-                        'curl' => $curlOptions,
+                        'force_ip_resolve' => 'v4',
                     ])->timeout(15)->post($testUrl, [
                         'contents' => [
                             [
