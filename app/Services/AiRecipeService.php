@@ -205,16 +205,14 @@ JSON;
      */
     public function resolveGeminiModel(string $apiKey): string
     {
-        $configured = env('GEMINI_MODEL') ?: config('services.gemini.model');
-        if (!empty($configured) && $configured !== 'gemini-1.5-flash') {
-            return str_replace('models/', '', $configured);
-        }
-
+        // 1. Falls im Cache bereits ein funktionierendes Modell hinterlegt ist (ausser dem veralteten 1.5-flash)
         if ($cached = Cache::get('gemini_active_model')) {
-            return $cached;
+            if (!in_array($cached, ['gemini-1.5-flash', 'models/gemini-1.5-flash'], true)) {
+                return $cached;
+            }
         }
 
-        // Dynamische Abfrage der verfügbaren Modelle für diesen API-Schlüssel
+        // 2. Dynamische Live-Abfrage der tatsächlich für diesen API-Schlüssel freigeschalteten Modelle
         try {
             $resp = Http::withOptions(['verify' => false])
                 ->timeout(8)
@@ -228,14 +226,14 @@ JSON;
                     $methods = $m['supportedGenerationMethods'] ?? [];
                     if (in_array('generateContent', $methods, true)) {
                         $name = str_replace('models/', '', $m['name'] ?? '');
-                        if (!empty($name)) {
+                        if (!empty($name) && !str_contains($name, '1.5-flash') && !str_contains($name, 'embedding')) {
                             $candidates[] = $name;
                         }
                     }
                 }
 
-                // Präferenz für moderne Flash-Modelle
-                $priorities = ['2.5-flash', '2.0-flash', '1.5-flash-latest', 'flash', 'pro'];
+                // Bevorzuge moderne schnelle Flash-Modelle
+                $priorities = ['2.5-flash', 'flash', '2.5-pro', 'pro'];
                 foreach ($priorities as $prio) {
                     foreach ($candidates as $cand) {
                         if (str_contains(strtolower($cand), $prio)) {
@@ -254,6 +252,12 @@ JSON;
             Log::warning("Gemini ListModels fehlgeschlagen: " . $e->getMessage());
         }
 
+        // 3. Fallback auf konfigurierte oder bewährte Standardmodelle
+        $configured = env('GEMINI_MODEL') ?: config('services.gemini.model');
+        if (!empty($configured) && !in_array($configured, ['gemini-1.5-flash', 'models/gemini-1.5-flash'], true)) {
+            return str_replace('models/', '', $configured);
+        }
+
         return 'gemini-2.5-flash';
     }
 
@@ -265,13 +269,14 @@ JSON;
         $apiKey = $this->getGeminiKey();
         $primaryModel = $this->resolveGeminiModel($apiKey);
 
-        $modelsToTry = array_unique([
+        $modelsToTry = array_values(array_unique(array_filter([
             $primaryModel,
             'gemini-2.5-flash',
+            'gemini-2.5-pro',
             'gemini-2.0-flash',
             'gemini-1.5-flash-latest',
             'gemini-1.5-pro',
-        ]);
+        ])));
 
         $payload = [
             'contents' => [
@@ -312,8 +317,12 @@ JSON;
             $lastError = "Google Gemini Fehler ({$model}): {$errBody}";
             Log::warning("Gemini Vision Versuch mit '{$model}' fehlgeschlagen: {$errBody}");
 
-            // Wenn es kein 404/Modell-Fehler ist (z.B. falscher API-Key), sofort werfen
-            if ($response->status() !== 404 && !str_contains($errBody, 'not found')) {
+            // Wenn es kein 404/Modell-Fehler ist (z.B. falscher API-Key), sofort abbrechen
+            $isModelIssue = $response->status() === 404
+                || str_contains($errBody, 'not found')
+                || str_contains($errBody, 'not supported');
+
+            if (!$isModelIssue) {
                 throw new \Exception("Google Gemini Fehler: {$errBody}");
             }
         }
@@ -329,13 +338,14 @@ JSON;
         $apiKey = $this->getGeminiKey();
         $primaryModel = $this->resolveGeminiModel($apiKey);
 
-        $modelsToTry = array_unique([
+        $modelsToTry = array_values(array_unique(array_filter([
             $primaryModel,
             'gemini-2.5-flash',
+            'gemini-2.5-pro',
             'gemini-2.0-flash',
             'gemini-1.5-flash-latest',
             'gemini-1.5-pro',
-        ]);
+        ])));
 
         $payload = [
             'contents' => [
@@ -369,7 +379,11 @@ JSON;
             $errBody = $response->json()['error']['message'] ?? $response->body();
             $lastError = "Google Gemini Fehler ({$model}): {$errBody}";
 
-            if ($response->status() !== 404 && !str_contains($errBody, 'not found')) {
+            $isModelIssue = $response->status() === 404
+                || str_contains($errBody, 'not found')
+                || str_contains($errBody, 'not supported');
+
+            if (!$isModelIssue) {
                 throw new \Exception("Google Gemini Fehler: {$errBody}");
             }
         }
