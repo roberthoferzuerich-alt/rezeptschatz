@@ -93,9 +93,12 @@ class TestAiConnectionCommand extends Command
             // 2. Testaufruf an die ersten funktionierenden Modelle
             $testCandidate = $contentModels[0];
             foreach ($contentModels as $c) {
-                if (str_contains($c, 'flash') || str_contains($c, 'pro')) {
+                if (str_contains($c, '3.8-flash')) {
                     $testCandidate = $c;
                     break;
+                }
+                if (str_contains($c, 'flash')) {
+                    $testCandidate = $c;
                 }
             }
 

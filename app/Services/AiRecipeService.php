@@ -205,11 +205,12 @@ JSON;
      */
     public function resolveGeminiModel(string $apiKey): string
     {
-        // 1. Falls im Cache bereits ein funktionierendes Modell hinterlegt ist (ausser dem veralteten 1.5-flash)
+        // 1. Falls im Cache bereits ein funktionierendes Modell hinterlegt ist (ausser veralteten Modellen)
         if ($cached = Cache::get('gemini_active_model')) {
-            if (!in_array($cached, ['gemini-1.5-flash', 'models/gemini-1.5-flash'], true)) {
-                return $cached;
+            if (!str_contains($cached, '1.5') && !str_contains($cached, '2.5')) {
+                return str_replace('models/', '', $cached);
             }
+            Cache::forget('gemini_active_model');
         }
 
         // 2. Dynamische Live-Abfrage der tatsächlich für diesen API-Schlüssel freigeschalteten Modelle
@@ -226,14 +227,14 @@ JSON;
                     $methods = $m['supportedGenerationMethods'] ?? [];
                     if (in_array('generateContent', $methods, true)) {
                         $name = str_replace('models/', '', $m['name'] ?? '');
-                        if (!empty($name) && !str_contains($name, '1.5-flash') && !str_contains($name, 'embedding')) {
+                        if (!empty($name) && !str_contains($name, '1.5') && !str_contains($name, 'embedding')) {
                             $candidates[] = $name;
                         }
                     }
                 }
 
                 // Bevorzuge moderne schnelle Flash-Modelle
-                $priorities = ['2.5-flash', 'flash', '2.5-pro', 'pro'];
+                $priorities = ['3.8-flash', '3.8-pro', 'flash', 'pro'];
                 foreach ($priorities as $prio) {
                     foreach ($candidates as $cand) {
                         if (str_contains(strtolower($cand), $prio)) {
@@ -254,11 +255,11 @@ JSON;
 
         // 3. Fallback auf konfigurierte oder bewährte Standardmodelle
         $configured = env('GEMINI_MODEL') ?: config('services.gemini.model');
-        if (!empty($configured) && !in_array($configured, ['gemini-1.5-flash', 'models/gemini-1.5-flash'], true)) {
+        if (!empty($configured) && !str_contains($configured, '1.5') && !str_contains($configured, '2.5')) {
             return str_replace('models/', '', $configured);
         }
 
-        return 'gemini-2.5-flash';
+        return 'gemini-3.8-flash';
     }
 
     /**
@@ -271,11 +272,10 @@ JSON;
 
         $modelsToTry = array_values(array_unique(array_filter([
             $primaryModel,
+            'gemini-3.8-flash',
+            'gemini-3.8-pro',
             'gemini-2.5-flash',
             'gemini-2.5-pro',
-            'gemini-2.0-flash',
-            'gemini-1.5-flash-latest',
-            'gemini-1.5-pro',
         ])));
 
         $payload = [
@@ -322,6 +322,10 @@ JSON;
                 || str_contains($errBody, 'not found')
                 || str_contains($errBody, 'not supported');
 
+            if ($isModelIssue && Cache::get('gemini_active_model') === $model) {
+                Cache::forget('gemini_active_model');
+            }
+
             if (!$isModelIssue) {
                 throw new \Exception("Google Gemini Fehler: {$errBody}");
             }
@@ -340,11 +344,10 @@ JSON;
 
         $modelsToTry = array_values(array_unique(array_filter([
             $primaryModel,
+            'gemini-3.8-flash',
+            'gemini-3.8-pro',
             'gemini-2.5-flash',
             'gemini-2.5-pro',
-            'gemini-2.0-flash',
-            'gemini-1.5-flash-latest',
-            'gemini-1.5-pro',
         ])));
 
         $payload = [
@@ -382,6 +385,10 @@ JSON;
             $isModelIssue = $response->status() === 404
                 || str_contains($errBody, 'not found')
                 || str_contains($errBody, 'not supported');
+
+            if ($isModelIssue && Cache::get('gemini_active_model') === $model) {
+                Cache::forget('gemini_active_model');
+            }
 
             if (!$isModelIssue) {
                 throw new \Exception("Google Gemini Fehler: {$errBody}");
