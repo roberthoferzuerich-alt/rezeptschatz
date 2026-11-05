@@ -13,3 +13,4 @@ self.addEventListener('fetch', (event) => {
     // Standard Netzwerk-Anfrage
     event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
 });
+
