@@ -102,10 +102,10 @@ class TestAiConnectionCommand extends Command
                 }
             }
 
-            $this->info("Führe Test-Generierung mit Modell '{$testCandidate}' durch...");
+            $this->info("Führe Test-Generierung mit Modell '{$testCandidate}' durch (Timeout: 45s)...");
 
             $testUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$testCandidate}:generateContent?key={$apiKey}";
-            $testResponse = Http::withOptions(['verify' => false])->timeout(15)->post($testUrl, [
+            $testResponse = Http::withOptions(['verify' => false])->timeout(45)->post($testUrl, [
                 'contents' => [
                     [
                         'parts' => [

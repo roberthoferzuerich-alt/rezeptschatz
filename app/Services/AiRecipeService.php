@@ -303,7 +303,7 @@ JSON;
             $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
             $response = Http::withOptions(['verify' => false])
-                ->timeout(60)
+                ->timeout(90)
                 ->post($url, $payload);
 
             if ($response->successful()) {
@@ -369,7 +369,7 @@ JSON;
             $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
             $response = Http::withOptions(['verify' => false])
-                ->timeout(60)
+                ->timeout(90)
                 ->post($url, $payload);
 
             if ($response->successful()) {
