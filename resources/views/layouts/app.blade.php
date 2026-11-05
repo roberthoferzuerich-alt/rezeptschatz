@@ -232,6 +232,10 @@
                     <span class="material-symbols-outlined text-base">add</span>
                     <span>Rezept erstellen</span>
                 </a>
+                <a href="{{ route('recipes.scan') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100 flex items-center justify-between text-stone-800">
+                    <span>Scann ein Rezept</span>
+                    <span class="material-symbols-outlined text-[#8ea92c] text-base">document_scanner</span>
+                </a>
                 <a href="{{ route('recipes.import.web') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100 flex items-center justify-between text-stone-800">
                     <span>Aus dem Web (URL) importieren</span>
                     <span class="material-symbols-outlined text-[#8ea92c] text-base">public</span>

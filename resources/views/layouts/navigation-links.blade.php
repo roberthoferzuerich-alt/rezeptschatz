@@ -31,9 +31,9 @@
             <span>Rezept erstellen</span>
             <span class="material-symbols-outlined text-base text-[#8ea92c]">add_circle</span>
         </a>
-        <a href="{{ route('account.index', ['tab' => 'help']) }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+        <a href="{{ route('recipes.scan') }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
             <span>Scann ein Rezept</span>
-            <span class="text-[10px] uppercase font-bold bg-stone-100 text-stone-500 px-1.5 py-0.5 rounded">In Kürze</span>
+            <span class="text-[10px] uppercase font-bold bg-[#8ea92c]/15 text-[#8ea92c] px-1.5 py-0.5 rounded">Neu</span>
         </a>
         <a href="{{ route('recipes.chatgpt') }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
             <span>Mit ChatGPT kochen</span>
@@ -135,3 +135,4 @@
         </a>
     </div>
 </div>
+
