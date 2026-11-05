@@ -184,3 +184,4 @@ class ChatGptCooking extends Component
         ]);
     }
 }
+

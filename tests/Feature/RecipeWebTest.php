@@ -222,4 +222,22 @@ class RecipeWebTest extends TestCase
             ->assertSee('1. Kartoffeln waschen und in Spalten schneiden.')
             ->assertSee('In Zwischenablage kopieren');
     }
+
+    public function test_user_can_toggle_categories_in_recipe_form(): void
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+        $category = Category::create([
+            'user_id' => $user->id,
+            'name' => 'Kartoffel',
+            'color' => '#8ea92c',
+        ]);
+
+        \Livewire\Livewire::actingAs($user)
+            ->test(\App\Livewire\RecipeForm::class)
+            ->assertSet('selectedCategoryIds', [])
+            ->call('toggleCategory', $category->id)
+            ->assertSet('selectedCategoryIds', [$category->id])
+            ->call('toggleCategory', $category->id)
+            ->assertSet('selectedCategoryIds', []);
+    }
 }
