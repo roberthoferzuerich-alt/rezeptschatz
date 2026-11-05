@@ -130,14 +130,14 @@ class CookmateImportService
                 $recipe = Recipe::create([
                     'id' => $recipeId,
                     'user_id' => $user->id,
-                    'title' => $title,
+                    'title' => mb_substr($title, 0, 255),
                     'description' => $description ?: null,
                     'portions' => $portions ?: 4,
                     'prep_time_minutes' => $prepTime,
                     'cook_time_minutes' => $cookTime,
                     'rest_time_minutes' => $restTime,
                     'notes' => $notes ?: null,
-                    'source_url' => $sourceUrl ?: null,
+                    'source_url' => $sourceUrl ? mb_substr($sourceUrl, 0, 1000) : null,
                     'is_favorite' => ((int)$node->rating >= 4),
                     'is_shared' => true, // Standardmäßig für die Familie geteilt
                     'image_path' => $imagePath,
@@ -150,6 +150,7 @@ class CookmateImportService
                     foreach ($node->category as $catNode) {
                         $catName = trim((string)$catNode);
                         if (!empty($catName)) {
+                            $catName = mb_substr($catName, 0, 100);
                             $category = Category::firstOrCreate(
                                 ['user_id' => $user->id, 'name' => $catName],
                                 ['color' => '#8ea92c']
@@ -173,8 +174,8 @@ class CookmateImportService
                             'recipe_id' => $recipe->id,
                             'name' => $parsed['name'],
                             'amount_numeric' => $parsed['amount_numeric'],
-                            'unit' => $parsed['unit'],
-                            'amount_text' => $parsed['amount_text'],
+                            'unit' => $parsed['unit'] ? mb_substr($parsed['unit'], 0, 50) : null,
+                            'amount_text' => $parsed['amount_text'] ? mb_substr($parsed['amount_text'], 0, 100) : null,
                             'sort_order' => $ingOrder++,
                         ]);
                     }
@@ -384,3 +385,4 @@ class CookmateImportService
         return null;
     }
 }
+

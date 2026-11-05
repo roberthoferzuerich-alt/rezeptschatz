@@ -67,3 +67,4 @@ class ImportCookmateCommand extends Command
         }
     }
 }
+
