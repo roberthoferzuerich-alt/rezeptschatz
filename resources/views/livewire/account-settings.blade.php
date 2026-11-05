@@ -425,17 +425,56 @@
 
             @if ($tab === 'websites')
                 <div class="space-y-6">
-                    <div>
-                        <h3 class="text-lg font-bold text-stone-900">Unterstützte Webseiten</h3>
-                        <p class="text-sm text-stone-500">Übersicht der Rezept-Webseiten für den Import.</p>
+                    <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+                        <div>
+                            <h3 class="text-lg font-bold text-stone-900">Unterstützte Webseiten</h3>
+                            <p class="text-sm text-stone-500">Rezeptschatz unterstützt durch Schema.org (JSON-LD) hunderte Rezeptportale weltweit.</p>
+                        </div>
+                        <a href="{{ route('recipes.import.web') }}" class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-[#8ea92c] hover:bg-[#7c9526] text-white text-xs font-semibold rounded-lg shadow-xs transition">
+                            <span class="material-symbols-outlined text-sm">public</span>
+                            <span>Web-Import öffnen</span>
+                        </a>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-                        <div class="p-3 bg-stone-50 rounded-lg border border-stone-200 font-medium">Betty Bossi (CH)</div>
-                        <div class="p-3 bg-stone-50 rounded-lg border border-stone-200 font-medium">Swissmilk (CH)</div>
-                        <div class="p-3 bg-stone-50 rounded-lg border border-stone-200 font-medium">Chefkoch (DE)</div>
-                        <div class="p-3 bg-stone-50 rounded-lg border border-stone-200 font-medium">Migusto / Migros (CH)</div>
-                        <div class="p-3 bg-stone-50 rounded-lg border border-stone-200 font-medium">Fooby / Coop (CH)</div>
-                        <div class="p-3 bg-stone-50 rounded-lg border border-stone-200 font-medium">Eatsmarter (DE)</div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                        <!-- Schweiz -->
+                        <div class="p-4 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-2">
+                            <h4 class="font-bold text-stone-900 text-sm border-b border-stone-100 pb-1">🇨🇭 Schweiz</h4>
+                            <ul class="space-y-1.5 text-stone-600">
+                                <li><a href="https://migusto.migros.ch" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Migusto (Migros) ↗</a></li>
+                                <li><a href="https://www.bettybossi.ch" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Betty Bossi ↗</a></li>
+                                <li><a href="https://www.swissmilk.ch" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Swissmilk ↗</a></li>
+                                <li><a href="https://fooby.ch" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Fooby (Coop) ↗</a></li>
+                                <li><a href="https://www.gutekueche.ch" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">GuteKüche Schweiz ↗</a></li>
+                                <li><a href="https://www.wildeisen.ch" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Annemarie Wildeisen ↗</a></li>
+                                <li><a href="https://www.srf.ch/sendungen/landfrauenkueche" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">SRF Landfrauenküche ↗</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Deutschland & Österreich -->
+                        <div class="p-4 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-2">
+                            <h4 class="font-bold text-stone-900 text-sm border-b border-stone-100 pb-1">🇩🇪 / 🇦🇹 DE & AT</h4>
+                            <ul class="space-y-1.5 text-stone-600">
+                                <li><a href="https://www.chefkoch.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Chefkoch.de ↗</a></li>
+                                <li><a href="https://www.essen-und-trinken.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Essen & Trinken ↗</a></li>
+                                <li><a href="https://www.lecker.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Lecker.de ↗</a></li>
+                                <li><a href="https://www.kuechengoetter.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Küchengötter ↗</a></li>
+                                <li><a href="https://www.einfachbacken.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Einfach Backen ↗</a></li>
+                                <li><a href="https://www.gutekueche.at" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">GuteKüche Österreich ↗</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- International & Food Blogs -->
+                        <div class="p-4 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-2">
+                            <h4 class="font-bold text-stone-900 text-sm border-b border-stone-100 pb-1">🌍 International & Blogs</h4>
+                            <ul class="space-y-1.5 text-stone-600">
+                                <li><a href="https://www.bbcgoodfood.com" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">BBC Good Food ↗</a></li>
+                                <li><a href="https://www.allrecipes.com" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Allrecipes ↗</a></li>
+                                <li><a href="https://www.jamieoliver.com" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Jamie Oliver ↗</a></li>
+                                <li><a href="https://www.seriouseats.com" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Serious Eats ↗</a></li>
+                                <li class="pt-1 text-[11px] text-stone-500 italic">Sowie unzählige Food-Blogs weltweit.</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             @endif

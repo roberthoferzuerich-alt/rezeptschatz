@@ -64,6 +64,72 @@
                 </div>
             </div>
         @endif
+
+        <!-- Dezent einklappbare Übersicht der beliebtesten Webseiten (stört nicht) -->
+        <div class="border-t border-stone-100 pt-3" x-data="{ open: false }">
+            <button type="button" @click="open = !open" 
+                    class="text-xs text-stone-500 hover:text-stone-800 transition flex items-center space-x-1.5 focus:outline-none select-none py-1">
+                <span class="material-symbols-outlined text-sm text-[#8ea92c]">help_outline</span>
+                <span>Welche Webseiten werden unterstützt?</span>
+                <span class="text-[11px] text-stone-400" x-text="open ? '(Ausblenden)' : '(Hier klicken zum Einblenden)'"></span>
+                <span class="material-symbols-outlined text-sm transition-transform duration-200" :class="open ? 'rotate-180' : ''">expand_more</span>
+            </button>
+
+            <div x-show="open" x-transition.opacity.duration.200ms style="display: none;" class="mt-3 text-xs text-stone-600 space-y-3 bg-stone-50/80 p-4 rounded-xl border border-stone-200">
+                <p class="text-stone-500">
+                    Rezeptschatz nutzt das universelle <strong>Schema.org (JSON-LD)</strong> Format und funktioniert mit hunderten Koch-Portalen weltweit. Hier eine Auswahl der beliebtesten Seiten (Klick öffnet die Seite im neuen Tab zum Stöbern):
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <!-- Schweiz -->
+                    <div class="bg-white p-3 rounded-lg border border-stone-200 space-y-1.5 shadow-2xs">
+                        <div class="font-bold text-stone-800 flex items-center space-x-1 text-xs border-b border-stone-100 pb-1">
+                            <span>🇨🇭 Schweiz</span>
+                        </div>
+                        <ul class="space-y-1 text-stone-600">
+                            <li><a href="https://migusto.migros.ch" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Migusto (Migros) ↗</a></li>
+                            <li><a href="https://www.bettybossi.ch" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Betty Bossi ↗</a></li>
+                            <li><a href="https://www.swissmilk.ch" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Swissmilk ↗</a></li>
+                            <li><a href="https://fooby.ch" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Fooby (Coop) ↗</a></li>
+                            <li><a href="https://www.gutekueche.ch" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">GuteKüche Schweiz ↗</a></li>
+                            <li><a href="https://www.wildeisen.ch" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Annemarie Wildeisen ↗</a></li>
+                            <li><a href="https://www.srf.ch/sendungen/landfrauenkueche" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">SRF Landfrauenküche ↗</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Deutschland & Österreich -->
+                    <div class="bg-white p-3 rounded-lg border border-stone-200 space-y-1.5 shadow-2xs">
+                        <div class="font-bold text-stone-800 flex items-center space-x-1 text-xs border-b border-stone-100 pb-1">
+                            <span>🇩🇪 / 🇦🇹 DE & AT</span>
+                        </div>
+                        <ul class="space-y-1 text-stone-600">
+                            <li><a href="https://www.chefkoch.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Chefkoch.de ↗</a></li>
+                            <li><a href="https://www.essen-und-trinken.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Essen & Trinken ↗</a></li>
+                            <li><a href="https://www.lecker.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Lecker.de ↗</a></li>
+                            <li><a href="https://www.kuechengoetter.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Küchengötter ↗</a></li>
+                            <li><a href="https://www.einfachbacken.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Einfach Backen ↗</a></li>
+                            <li><a href="https://www.gutekueche.at" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">GuteKüche Österreich ↗</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- International & Food Blogs -->
+                    <div class="bg-white p-3 rounded-lg border border-stone-200 space-y-1.5 shadow-2xs">
+                        <div class="font-bold text-stone-800 flex items-center space-x-1 text-xs border-b border-stone-100 pb-1">
+                            <span>🌍 International & Blogs</span>
+                        </div>
+                        <ul class="space-y-1 text-stone-600">
+                            <li><a href="https://www.bbcgoodfood.com" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">BBC Good Food ↗</a></li>
+                            <li><a href="https://www.allrecipes.com" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Allrecipes ↗</a></li>
+                            <li><a href="https://www.jamieoliver.com" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Jamie Oliver ↗</a></li>
+                            <li><a href="https://www.seriouseats.com" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Serious Eats ↗</a></li>
+                            <li class="pt-1 text-[11px] text-stone-500 italic">
+                                Sowie tausende private Food-Blogs mit WP Recipe Maker.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- VORSCHAU & VOLLSTÄNDIGKEITSPRÜFUNG -->
