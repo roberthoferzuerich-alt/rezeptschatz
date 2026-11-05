@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -20,7 +21,9 @@ class AiRecipeService
      */
     public function getActiveProvider(): ?string
     {
-        $preferred = config('services.ai.provider', env('AI_PROVIDER', 'gemini'));
+        $preferred = Cache::get('ai_provider') 
+            ?: config('services.ai.provider', env('AI_PROVIDER', 'gemini'));
+
         if ($preferred === 'gemini' && !empty($this->getGeminiKey())) {
             return 'gemini';
         }
@@ -38,12 +41,54 @@ class AiRecipeService
 
     public function getGeminiKey(): ?string
     {
-        return config('services.gemini.api_key') ?: env('GEMINI_API_KEY');
+        $key = Cache::get('ai_gemini_api_key') 
+            ?: config('services.gemini.api_key') 
+            ?: env('GEMINI_API_KEY');
+
+        return !empty($key) ? trim((string)$key) : null;
     }
 
     public function getOpenAiKey(): ?string
     {
-        return config('services.openai.api_key') ?: env('OPENAI_API_KEY');
+        $key = Cache::get('ai_openai_api_key') 
+            ?: config('services.openai.api_key') 
+            ?: env('OPENAI_API_KEY');
+
+        return !empty($key) ? trim((string)$key) : null;
+    }
+
+    /**
+     * Speichert einen API-Schlüssel persistent in Datenbank-Cache und .env.
+     */
+    public function saveApiKey(string $provider, string $key): void
+    {
+        $key = trim($key);
+        if ($provider === 'openai') {
+            Cache::forever('ai_openai_api_key', $key);
+            Cache::forever('ai_provider', 'openai');
+            config(['services.openai.api_key' => $key, 'services.ai.provider' => 'openai']);
+            $this->updateEnvKey('OPENAI_API_KEY', $key);
+            $this->updateEnvKey('AI_PROVIDER', 'openai');
+        } else {
+            Cache::forever('ai_gemini_api_key', $key);
+            Cache::forever('ai_provider', 'gemini');
+            config(['services.gemini.api_key' => $key, 'services.ai.provider' => 'gemini']);
+            $this->updateEnvKey('GEMINI_API_KEY', $key);
+            $this->updateEnvKey('AI_PROVIDER', 'gemini');
+        }
+    }
+
+    /**
+     * Entfernt alle gespeicherten KI-API-Schlüssel.
+     */
+    public function removeApiKey(): void
+    {
+        Cache::forget('ai_gemini_api_key');
+        Cache::forget('ai_openai_api_key');
+        Cache::forget('ai_provider');
+        config(['services.gemini.api_key' => null, 'services.openai.api_key' => null]);
+        $this->updateEnvKey('GEMINI_API_KEY', '');
+        $this->updateEnvKey('OPENAI_API_KEY', '');
     }
 
     /**

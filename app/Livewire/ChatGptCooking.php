@@ -259,7 +259,7 @@ class ChatGptCooking extends Component
     }
 
     /**
-     * Speichert einen neuen API-Schlüssel in die .env-Datei.
+     * Speichert einen neuen API-Schlüssel persistent in Datenbank & .env.
      */
     public function saveApiKey(AiRecipeService $aiService): void
     {
@@ -269,23 +269,24 @@ class ChatGptCooking extends Component
             return;
         }
 
-        $envKeyName = ($this->apiProviderInput === 'openai') ? 'OPENAI_API_KEY' : 'GEMINI_API_KEY';
-        $success = $aiService->updateEnvKey($envKeyName, $key);
+        $aiService->saveApiKey($this->apiProviderInput, $key);
 
-        if ($this->apiProviderInput === 'openai') {
-            $aiService->updateEnvKey('AI_PROVIDER', 'openai');
-        } else {
-            $aiService->updateEnvKey('AI_PROVIDER', 'gemini');
-        }
+        $this->showApiKeyModal = false;
+        $this->apiKeyInput = '';
+        $this->successMessage = 'API-Schlüssel wurde erfolgreich gespeichert und aktiviert!';
+        $this->errorMessage = null;
+    }
 
-        if ($success) {
-            $this->showApiKeyModal = false;
-            $this->apiKeyInput = '';
-            $this->successMessage = 'API-Schlüssel wurde erfolgreich gespeichert!';
-            $this->errorMessage = null;
-        } else {
-            $this->errorMessage = 'Konnte .env-Datei nicht beschreiben.';
-        }
+    /**
+     * Entfernt den gespeicherten API-Schlüssel.
+     */
+    public function removeApiKey(AiRecipeService $aiService): void
+    {
+        $aiService->removeApiKey();
+        $this->showApiKeyModal = false;
+        $this->apiKeyInput = '';
+        $this->successMessage = 'API-Schlüssel wurde entfernt.';
+        $this->errorMessage = null;
     }
 
     /**

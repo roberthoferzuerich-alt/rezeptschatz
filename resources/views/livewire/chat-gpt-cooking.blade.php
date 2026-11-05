@@ -103,6 +103,15 @@
                 </div>
             </div>
 
+            @if ($isAiConfigured)
+                <div class="pt-2 flex justify-between items-center text-xs border-t border-stone-200/60">
+                    <span class="text-stone-600">Aktueller Anbieter: <strong>{{ ucfirst($activeAiProvider) }}</strong> (aktiv)</span>
+                    <button type="button" wire:click="removeApiKey" class="text-rose-600 hover:text-rose-800 font-semibold hover:underline">
+                        Schlüssel entfernen
+                    </button>
+                </div>
+            @endif
+
             <div class="text-[11px] text-stone-500 bg-white/70 p-3 rounded-xl border border-stone-200/80">
                 <strong class="text-stone-700">Tipp für Google Gemini (Kostenlos):</strong> Besuchen Sie 
                 <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[#8ea92c] font-semibold underline">aistudio.google.com</a>, 

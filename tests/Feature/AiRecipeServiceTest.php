@@ -104,4 +104,17 @@ class AiRecipeServiceTest extends TestCase
         putenv('OPENAI_API_KEY');
         putenv('AI_PROVIDER=gemini');
     }
+
+    public function test_can_save_and_remove_api_key_via_service(): void
+    {
+        $service = app(AiRecipeService::class);
+        $service->saveApiKey('gemini', 'my_saved_gemini_key');
+
+        $this->assertTrue($service->isConfigured());
+        $this->assertEquals('gemini', $service->getActiveProvider());
+        $this->assertEquals('my_saved_gemini_key', $service->getGeminiKey());
+
+        $service->removeApiKey();
+        $this->assertNull($service->getGeminiKey());
+    }
 }
