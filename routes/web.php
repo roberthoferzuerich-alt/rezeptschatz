@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\RecipeImageController;
 use App\Livewire\AccountSettings;
 use App\Livewire\CategoryManager;
+use App\Livewire\ChatGptCooking;
 use App\Livewire\RecipeDetail;
 use App\Livewire\RecipeForm;
 use App\Livewire\RecipeImport;
@@ -29,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/recipes', RecipeList::class)->name('recipes.index');
     Route::get('/recipes/create', RecipeForm::class)->name('recipes.create');
     Route::get('/recipes/import', RecipeImport::class)->name('recipes.import');
+    Route::get('/recipes/chatgpt', ChatGptCooking::class)->name('recipes.chatgpt');
     Route::get('/recipes/{id}/edit', RecipeForm::class)->name('recipes.edit');
     Route::get('/recipes/{id}', RecipeDetail::class)->name('recipes.show');
 
