@@ -103,3 +103,4 @@ class AssignCategoryCommand extends Command
         return self::SUCCESS;
     }
 }
+

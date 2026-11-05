@@ -50,6 +50,7 @@ class RecipeWebTest extends TestCase
         $recipe = Recipe::create([
             'user_id' => $user->id,
             'title' => 'Test-Nudelpfanne',
+            'description' => 'Feine schnelle Nudelpfanne mit frischem Gemüse',
             'portions' => 4,
             'server_version' => 1,
             'is_shared' => true,
@@ -58,6 +59,7 @@ class RecipeWebTest extends TestCase
         $response = $this->actingAs($user)->get('/recipes');
         $response->assertStatus(200);
         $response->assertSee('Test-Nudelpfanne');
+        $response->assertSee('Feine schnelle Nudelpfanne mit frischem Gemüse');
     }
 
     public function test_family_member_can_view_shared_recipe(): void

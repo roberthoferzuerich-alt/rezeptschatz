@@ -164,10 +164,10 @@
                             @endif
                         </a>
 
-                        <!-- Kachel-Footer mit Titel & 5 Sternen -->
+                        <!-- Kachel-Footer mit Titel, Sternen & Beschreibung -->
                         <div class="p-3 flex-1 flex flex-col justify-between">
                             <div>
-                                <h3 class="font-bold text-stone-900 group-hover:text-[#8ea92c] transition text-sm sm:text-base line-clamp-2">
+                                <h3 class="font-bold text-stone-900 group-hover:text-[#8ea92c] transition text-sm sm:text-base line-clamp-2 leading-snug">
                                     <a href="{{ route('recipes.show', $recipe->id) }}">
                                         {{ $recipe->title }}
                                     </a>
@@ -181,10 +181,17 @@
                                     <span class="material-symbols-outlined text-sm leading-none">star_rate</span>
                                     <span class="material-symbols-outlined text-sm leading-none">star_rate</span>
                                 </div>
+
+                                <!-- Beschreibung des Rezepts in der Kachel -->
+                                @if (!empty(trim($recipe->description ?? '')))
+                                    <p class="text-xs text-stone-600 mt-2 line-clamp-2 leading-relaxed" title="{{ $recipe->description }}">
+                                        {{ $recipe->description }}
+                                    </p>
+                                @endif
                             </div>
 
                             @if ($recipe->categories->isNotEmpty())
-                                <div class="mt-2 pt-2 border-t border-stone-100 flex flex-wrap gap-1">
+                                <div class="mt-3 pt-2 border-t border-stone-100 flex flex-wrap gap-1">
                                     @foreach ($recipe->categories->take(2) as $category)
                                         <span class="inline-block px-1.5 py-0.5 rounded text-[10px] bg-stone-100 text-stone-600">
                                             {{ $category->name }}
