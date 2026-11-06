@@ -13,6 +13,7 @@ use App\Livewire\RecipeImport;
 use App\Livewire\RecipeList;
 use App\Livewire\RecipeScanner;
 use App\Livewire\ShoppingList;
+use App\Livewire\TagManager;
 use App\Livewire\WebRecipeImport;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +48,9 @@ Route::middleware('auth')->group(function () {
 
     // Kategorien
     Route::get('/categories', CategoryManager::class)->name('categories.index');
+
+    // Schlagwörter
+    Route::get('/tags', TagManager::class)->name('tags.index');
 
     // Einkaufsliste & Menüplaner
     Route::get('/shopping-list', ShoppingList::class)->name('shopping-list.index');

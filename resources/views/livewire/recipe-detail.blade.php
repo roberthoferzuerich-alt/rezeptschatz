@@ -83,9 +83,19 @@
                             </span>
 
                             @foreach ($recipe->categories as $category)
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-700">
+                                <a href="{{ route('recipes.index', ['kat' => $category->id]) }}" 
+                                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition">
                                     {{ $category->name }}
-                                </span>
+                                </a>
+                            @endforeach
+
+                            @foreach ($recipe->tags as $tag)
+                                <a href="{{ route('recipes.index', ['tag' => $tag->id]) }}" 
+                                   class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#8ea92c]/15 hover:bg-[#8ea92c]/25 text-[#8ea92c] transition"
+                                   title="Rezepte mit diesem Schlagwort filtern">
+                                    <span class="w-1.5 h-1.5 rounded-full" style="background-color: {{ $tag->color ?? '#8ea92c' }};"></span>
+                                    <span>#{{ $tag->name }}</span>
+                                </a>
                             @endforeach
                         </div>
                         <h1 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">{{ $recipe->title }}</h1>

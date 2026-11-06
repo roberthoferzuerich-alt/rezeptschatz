@@ -4,7 +4,9 @@ namespace App\Livewire;
 
 use App\Models\Category;
 use App\Models\Recipe;
+use App\Models\Tag;
 use App\Services\RecipeService;
+use App\Services\TagService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -40,6 +42,10 @@ class RecipeForm extends Component
     public array $selectedCategoryIds = [];
     public string $categorySearch = '';
 
+    // Schlagwörter (Tags)
+    public array $selectedTagIds = [];
+    public string $newTagName = '';
+
     public function toggleCategory(string $categoryId): void
     {
         if (in_array($categoryId, $this->selectedCategoryIds, true)) {
@@ -52,6 +58,30 @@ class RecipeForm extends Component
     public function deselectAllCategories(): void
     {
         $this->selectedCategoryIds = [];
+    }
+
+    public function toggleTag(string $tagId): void
+    {
+        if (in_array($tagId, $this->selectedTagIds, true)) {
+            $this->selectedTagIds = array_values(array_diff($this->selectedTagIds, [$tagId]));
+        } else {
+            $this->selectedTagIds[] = $tagId;
+        }
+    }
+
+    public function createAndAttachTag(TagService $tagService): void
+    {
+        $name = trim($this->newTagName);
+        if (empty($name)) {
+            return;
+        }
+
+        $tag = $tagService->findOrCreateTag(Auth::user(), $name);
+        if (!in_array($tag->id, $this->selectedTagIds, true)) {
+            $this->selectedTagIds[] = $tag->id;
+        }
+
+        $this->newTagName = '';
     }
 
     // Zutaten (dynamische Zeilen)
@@ -70,7 +100,7 @@ class RecipeForm extends Component
         if ($id) {
             $this->recipeId = $id;
             $this->isEditing = true;
-            $recipe = Recipe::with(['categories', 'ingredients', 'steps'])
+            $recipe = Recipe::with(['categories', 'tags', 'ingredients', 'steps'])
                 ->where('user_id', Auth::id())
                 ->findOrFail($id);
 
@@ -91,6 +121,7 @@ class RecipeForm extends Component
             $this->existingImagePath = $recipe->image_path;
 
             $this->selectedCategoryIds = $recipe->categories->pluck('id')->toArray();
+            $this->selectedTagIds = $recipe->tags->pluck('id')->toArray();
 
             foreach ($recipe->ingredients as $item) {
                 $this->ingredients[] = [
@@ -309,6 +340,7 @@ class RecipeForm extends Component
             'source_url' => trim($this->source_url),
             'is_favorite' => $this->is_favorite,
             'category_ids' => $this->selectedCategoryIds,
+            'tag_ids' => $this->selectedTagIds,
             'ingredients' => $cleanIngredients,
             'steps' => $cleanSteps,
         ];
@@ -377,9 +409,12 @@ class RecipeForm extends Component
         }
         $categories = $categoryQuery->get();
 
+        $tags = Tag::where('user_id', Auth::id())->orderBy('name')->get();
+
         return view('livewire.recipe-form', [
             'categories' => $categories,
             'totalCategoriesCount' => Category::where('user_id', Auth::id())->count(),
+            'tags' => $tags,
         ]);
     }
 }

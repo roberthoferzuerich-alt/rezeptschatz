@@ -179,6 +179,63 @@
             </div>
         </div>
 
+        <!-- 3. Schlagwörter (Tags) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-stone-100 pb-3 gap-2">
+                <div class="flex items-center space-x-2">
+                    <span class="material-symbols-outlined text-[#8ea92c]">style</span>
+                    <h2 class="text-base font-bold text-stone-900">Schlagwörter (Tags)</h2>
+                    <span class="text-xs text-stone-500 font-medium">({{ count($selectedTagIds) }} ausgewählt)</span>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <!-- Schnelles Anlegen neuer Schlagwörter direkt im Formular -->
+                    <div class="flex items-center space-x-1">
+                        <input wire:model="newTagName" 
+                               wire:keydown.enter.prevent="createAndAttachTag"
+                               type="text" 
+                               placeholder="+ Neues Schlagwort..." 
+                               class="px-2.5 py-1 text-xs border border-stone-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#8ea92c]">
+                        <button type="button" 
+                                wire:click="createAndAttachTag" 
+                                class="px-2.5 py-1 bg-stone-100 hover:bg-[#8ea92c] hover:text-white text-stone-700 text-xs font-semibold rounded-md transition"
+                                title="Schlagwort hinzufügen">
+                            +
+                        </button>
+                    </div>
+
+                    <a href="{{ route('tags.index') }}" target="_blank" 
+                       class="inline-flex items-center space-x-1 px-2.5 py-1 text-xs font-semibold text-[#8ea92c] bg-[#8ea92c]/10 hover:bg-[#8ea92c]/20 rounded-md transition" 
+                       title="Öffnet die Schlagwörter-Verwaltung in einem neuen Tab">
+                        <span class="material-symbols-outlined text-sm">tune</span>
+                        <span>Verwalten</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Klickbare Schlagwort-Chips -->
+            <div class="flex flex-wrap gap-2 pt-1 max-h-48 overflow-y-auto p-1 scrollbar-thin">
+                @forelse ($tags as $tag)
+                    @php
+                        $isSelected = in_array($tag->id, $selectedTagIds, true);
+                    @endphp
+                    <button type="button" 
+                            wire:click="toggleTag('{{ $tag->id }}')" 
+                            class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition cursor-pointer select-none {{ $isSelected ? 'bg-[#8ea92c] border-[#8ea92c] text-white shadow-xs font-semibold' : 'bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100 hover:border-stone-300' }}">
+                        <span class="w-2 h-2 rounded-full" style="background-color: {{ $isSelected ? '#ffffff' : ($tag->color ?? '#8ea92c') }};"></span>
+                        <span>#{{ $tag->name }}</span>
+                        @if ($isSelected)
+                            <span class="material-symbols-outlined text-xs leading-none">check</span>
+                        @endif
+                    </button>
+                @empty
+                    <p class="text-xs text-stone-400 italic py-2">
+                        Noch keine Schlagwörter vorhanden. Tippen Sie oben z. B. "Schnell" ein und drücken Sie Enter.
+                    </p>
+                @endforelse
+            </div>
+        </div>
+
         <!-- 3. Zutatenliste -->
         <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 space-y-4">
             <div class="flex items-center justify-between border-b border-stone-100 pb-2">

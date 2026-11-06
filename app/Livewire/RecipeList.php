@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Category;
 use App\Models\Recipe;
+use App\Models\Tag;
 use App\Services\RecipeService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -21,6 +22,9 @@ class RecipeList extends Component
 
     #[Url(as: 'kat')]
     public string $selectedCategory = '';
+
+    #[Url(as: 'tag')]
+    public string $selectedTag = '';
 
     #[Url(as: 'fav')]
     public bool $onlyFavorites = false;
@@ -54,6 +58,11 @@ class RecipeList extends Component
         $this->resetPage();
     }
 
+    public function updatingSelectedTag(): void
+    {
+        $this->resetPage();
+    }
+
     public function updatingOnlyFavorites(): void
     {
         $this->resetPage();
@@ -81,6 +90,12 @@ class RecipeList extends Component
         $this->resetPage();
     }
 
+    public function selectTag(string $tagId): void
+    {
+        $this->selectedTag = ($this->selectedTag === $tagId) ? '' : $tagId;
+        $this->resetPage();
+    }
+
     public function toggleFavoriteFilter(): void
     {
         $this->onlyFavorites = !$this->onlyFavorites;
@@ -91,6 +106,7 @@ class RecipeList extends Component
     {
         $this->search = '';
         $this->selectedCategory = '';
+        $this->selectedTag = '';
         $this->onlyFavorites = false;
         $this->authorFilter = 'all';
         $this->sortBy = 'updated_at';
@@ -101,7 +117,7 @@ class RecipeList extends Component
     {
         $userId = Auth::id();
 
-        $query = Recipe::with(['categories', 'user', 'favoritedBy', 'ingredients'])
+        $query = Recipe::with(['categories', 'tags', 'user', 'favoritedBy', 'ingredients'])
             ->where(function ($q) use ($userId) {
                 $q->where('user_id', $userId)
                   ->orWhere('is_shared', true);
@@ -130,6 +146,13 @@ class RecipeList extends Component
         if (!empty($this->selectedCategory)) {
             $query->whereHas('categories', function ($cq) {
                 $cq->where('categories.id', $this->selectedCategory);
+            });
+        }
+
+        // Schlagwort-Filter (Tags)
+        if (!empty($this->selectedTag)) {
+            $query->whereHas('tags', function ($tq) {
+                $tq->where('tags.id', $this->selectedTag);
             });
         }
 
@@ -169,6 +192,12 @@ class RecipeList extends Component
             $rq->where('user_id', $userId)->orWhere('is_shared', true);
         }])->orderBy('name')->get();
 
+        $tags = Tag::withCount(['recipes' => function ($rq) use ($userId) {
+            $rq->where('user_id', $userId)->orWhere('is_shared', true);
+        }])->orderBy('name')->get();
+
+        $selectedTagModel = !empty($this->selectedTag) ? Tag::find($this->selectedTag) : null;
+
         $totalRecipeCount = Recipe::where(function ($q) use ($userId) {
             $q->where('user_id', $userId)->orWhere('is_shared', true);
         })->count();
@@ -176,6 +205,8 @@ class RecipeList extends Component
         return view('livewire.recipe-list', [
             'recipes' => $recipes,
             'categories' => $categories,
+            'tags' => $tags,
+            'selectedTagModel' => $selectedTagModel,
             'totalRecipeCount' => $totalRecipeCount,
             'currentUserId' => $userId,
         ]);

@@ -223,13 +223,21 @@ Der Menüplaner (`/meal-planner`) strukturiert Ihre Kochwoche von Montag bis Son
 
 ---
 
-## 8. Kategorien verwalten
+## 8. Kategorien & Schlagwörter verwalten
 
-Kategorien bringen Ordnung in Ihre Rezeptsammlung (`/categories`):
-
-- **Standardkategorien:** Fleisch, Geflügel, Fisch, Teigwaren, Reis, Kartoffel, Gemüse, Pilz, Käse, Suppe, Salat, Dessert, Backen, etc.
+### Kategorien (`/categories`)
+Kategorien bringen eine klare Grundstruktur in Ihre Sammlung (nach Hauptzutaten & Gängen):
+- **Hauptzutaten:** Fleisch, Geflügel, Fisch, Teigwaren, Reis, Kartoffel, Gemüse, Pilz, Käse.
+- **Mahlzeitenarten:** Suppe, Salat, Dessert, Backen.
 - **Individuelle Farben:** Jede Kategorie kann eine eigene Erkennungsfarbe tragen (z. B. saftiges Grün für Gemüse, warmes Gold für Teigwaren).
-- **Automatische Zuweisung:** Wenn Sie neue Rezepte anlegen oder importieren, erkennt Rezeptschatz anhand der Zutaten oft automatisch die passende Kategorie.
+- **Automatische Erkennung:** Anhand der Zutaten werden Rezepte beim Erstellen oder Scannen automatisch den passenden Kategorien zugewiesen.
+
+### Schlagwörter / Tags (`/tags`)
+Schlagwörter ergänzen die Kategorien um flexible Eigenschaften wie Anlässe, Zubereitungsarten oder Saisons:
+- **Beispiele:** `#Schnell (< 30 Min.)`, `#Gäste & Fest`, `#Einfach & Alltag`, `#Klassiker`, `#Sommer`, `#Winter & Deftig`, `#Low-Carb`, `#Vegetarisch`, `#Resteverwertung`, `#Apéro`, `#Backofen`, `#Schweizer Küche`.
+- **Eigene Schlagwörter anlegen:** In der Schlagwörter-Verwaltung (`Rezepte > ➔ Schlagwörter`) oder direkt beim Erfassen eines Rezepts durch Eintippen und Enter-Drücken.
+- **Schnellfilter in der Rezeptliste:** In der Rezeptübersicht finden Sie alle Schlagwörter als praktische Filter-Chips. Ein Fingertipp genügt, um z. B. nur alle Rezepte für *„Gäste & Fest“* oder *„Schnell“* anzuzeigen.
+- **Verlinkung im Rezept:** In jeder Rezeptansicht sind die Schlagwörter klickbar und führen direkt zur gefilterten Liste.
 
 ---
 
@@ -283,3 +291,4 @@ php artisan optimize:clear
 3. **Portionen umrechnen:** Vor dem Kochen kurz auf `+` oder `-` tippen, um Fleisch- und Flüssigkeitsmengen exakt an die Gästezahl anzupassen.
 
 *Viel Freude beim Kochen und Geniessen mit Ihrem persönlichen Rezeptschatz!* 🍳🥗🥖
+

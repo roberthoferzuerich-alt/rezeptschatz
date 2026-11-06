@@ -54,6 +54,27 @@
                 </button>
             @endforeach
         </div>
+
+        <!-- Schlagwörter-Chips (falls vorhanden) -->
+        @if ($tags->isNotEmpty())
+            <div class="pt-2 border-t border-stone-100 flex items-center space-x-1.5 overflow-x-auto pb-1 scrollbar-thin text-xs">
+                <span class="text-stone-400 font-semibold text-[11px] uppercase mr-1 flex items-center shrink-0">
+                    <span class="material-symbols-outlined text-sm mr-0.5 text-[#8ea92c]">label</span>
+                    Schlagwörter:
+                </span>
+                <button wire:click="selectTag('')" 
+                        class="px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap transition {{ $selectedTag === '' ? 'bg-stone-800 text-white shadow-xs' : 'bg-stone-100 text-stone-600 hover:bg-stone-200' }}">
+                    Alle
+                </button>
+                @foreach ($tags as $t)
+                    <button wire:click="selectTag('{{ $t->id }}')" 
+                            class="px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap transition flex items-center space-x-1 {{ $selectedTag === $t->id ? 'bg-[#8ea92c] text-white shadow-xs font-bold' : 'bg-stone-100 text-stone-700 hover:bg-stone-200' }}">
+                        <span class="w-1.5 h-1.5 rounded-full" style="background-color: {{ $t->color ?? '#8ea92c' }};"></span>
+                        <span>#{{ $t->name }} ({{ $t->recipes_count }})</span>
+                    </button>
+                @endforeach
+            </div>
+        @endif
     </div>
 
     <!-- COOKmate-Style: Sortieren nach Leiste (wie im Screenshot) -->
@@ -83,8 +104,14 @@
 
     <!-- Obere Zeile mit Anzahl & Umschalt-Button (wie im Screenshot) -->
     <div class="flex items-center justify-between mb-4 px-1">
-        <div>
-            @if ($search || $selectedCategory || $onlyFavorites || $authorFilter !== 'all')
+        <div class="flex items-center flex-wrap gap-2">
+            @if ($selectedTagModel)
+                <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 bg-[#8ea92c]/15 text-[#8ea92c] rounded-full text-xs font-semibold">
+                    <span>#{{ $selectedTagModel->name }}</span>
+                    <button type="button" wire:click="selectTag('')" class="hover:text-stone-900 font-bold ml-1 text-sm leading-none">&times;</button>
+                </span>
+            @endif
+            @if ($search || $selectedCategory || $selectedTag || $onlyFavorites || $authorFilter !== 'all')
                 <button wire:click="resetFilters" class="text-xs text-[#8ea92c] hover:underline flex items-center space-x-1">
                     <span class="material-symbols-outlined text-sm">refresh</span>
                     <span>Filter zurücksetzen</span>
@@ -190,11 +217,16 @@
                                 @endif
                             </div>
 
-                            @if ($recipe->categories->isNotEmpty())
+                            @if ($recipe->categories->isNotEmpty() || $recipe->tags->isNotEmpty())
                                 <div class="mt-3 pt-2 border-t border-stone-100 flex flex-wrap gap-1">
                                     @foreach ($recipe->categories->take(2) as $category)
                                         <span class="inline-block px-1.5 py-0.5 rounded text-[10px] bg-stone-100 text-stone-600">
                                             {{ $category->name }}
+                                        </span>
+                                    @endforeach
+                                    @foreach ($recipe->tags->take(2) as $tag)
+                                        <span class="inline-block px-1.5 py-0.5 rounded text-[10px] bg-[#8ea92c]/10 text-[#8ea92c] font-medium">
+                                            #{{ $tag->name }}
                                         </span>
                                     @endforeach
                                 </div>

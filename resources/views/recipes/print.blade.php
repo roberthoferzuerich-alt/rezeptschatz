@@ -74,6 +74,10 @@
                             <span>•</span>
                             <span>{{ $recipe->categories->pluck('name')->join(', ') }}</span>
                         @endif
+                        @if ($recipe->tags->isNotEmpty())
+                            <span>•</span>
+                            <span>{{ $recipe->tags->map(fn($t) => '#' . $t->name)->join(' ') }}</span>
+                        @endif
                     </div>
 
                     <h1 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">

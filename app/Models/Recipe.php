@@ -74,6 +74,11 @@ class Recipe extends Model
         return $this->belongsToMany(Category::class, 'recipe_category');
     }
 
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'recipe_tag');
+    }
+
     public function favoritedBy(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'recipe_favorites')->withTimestamps();

@@ -13,7 +13,7 @@ class RecipePrintController extends Controller
     public function show(string $id)
     {
         $userId = Auth::id();
-        $recipe = Recipe::with(['categories', 'ingredients', 'steps', 'user'])
+        $recipe = Recipe::with(['categories', 'tags', 'ingredients', 'steps', 'user'])
             ->where(function ($q) use ($userId) {
                 $q->where('user_id', $userId)
                   ->orWhere('is_shared', true);

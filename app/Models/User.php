@@ -43,6 +43,11 @@ class User extends Authenticatable
         return $this->hasMany(Category::class);
     }
 
+    public function tags(): HasMany
+    {
+        return $this->hasMany(Tag::class);
+    }
+
     public function favoriteRecipes(): BelongsToMany
     {
         return $this->belongsToMany(Recipe::class, 'recipe_favorites')->withTimestamps();
@@ -74,6 +79,11 @@ class User extends Authenticatable
     }
 
     public function canManageCategories(): bool
+    {
+        return $this->isAdmin();
+    }
+
+    public function canManageTags(): bool
     {
         return $this->isAdmin();
     }

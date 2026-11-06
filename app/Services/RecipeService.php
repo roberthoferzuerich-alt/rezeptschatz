@@ -56,6 +56,11 @@ class RecipeService
                 $recipe->categories()->sync($data['category_ids']);
             }
 
+            // Schlagwörter verknüpfen
+            if (isset($data['tag_ids']) && is_array($data['tag_ids'])) {
+                $recipe->tags()->sync($data['tag_ids']);
+            }
+
             // Zutaten anlegen
             if (isset($data['ingredients']) && is_array($data['ingredients'])) {
                 foreach ($data['ingredients'] as $index => $item) {
@@ -127,6 +132,11 @@ class RecipeService
             // Kategorien aktualisieren
             if (isset($data['category_ids']) && is_array($data['category_ids'])) {
                 $recipe->categories()->sync($data['category_ids']);
+            }
+
+            // Schlagwörter aktualisieren
+            if (isset($data['tag_ids']) && is_array($data['tag_ids'])) {
+                $recipe->tags()->sync($data['tag_ids']);
             }
 
             // Zutaten atomar ersetzen

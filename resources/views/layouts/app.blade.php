@@ -257,6 +257,10 @@
                     <span class="material-symbols-outlined text-[#8ea92c] text-base">calendar_month</span>
                 </a>
                 <a href="{{ route('categories.index') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100">Kategorien</a>
+                <a href="{{ route('tags.index') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100 flex items-center justify-between">
+                    <span>Schlagwörter</span>
+                    <span class="text-[10px] uppercase font-bold bg-[#8ea92c]/15 text-[#8ea92c] px-1.5 py-0.5 rounded">Neu</span>
+                </a>
             </div>
 
             <div class="pt-2 border-t border-stone-200 space-y-1 text-sm font-medium">

@@ -49,9 +49,9 @@
         <a href="{{ route('categories.index') }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
             Kategorien
         </a>
-        <a href="{{ route('account.index', ['tab' => 'help']) }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+        <a href="{{ route('tags.index') }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
             <span>Schlagwörter</span>
-            <span class="text-[10px] uppercase font-bold bg-stone-100 text-stone-500 px-1.5 py-0.5 rounded">In Kürze</span>
+            <span class="text-[10px] uppercase font-bold bg-[#8ea92c]/15 text-[#8ea92c] px-1.5 py-0.5 rounded">Neu</span>
         </a>
         <a href="{{ route('account.index', ['tab' => 'help']) }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
             <span>Verknüpfte Rezepte</span>

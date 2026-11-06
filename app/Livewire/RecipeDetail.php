@@ -47,7 +47,7 @@ class RecipeDetail extends Component
     public function copyRecipe(RecipeService $recipeService)
     {
         $user = Auth::user();
-        $sourceRecipe = Recipe::with(['categories', 'ingredients', 'steps'])
+        $sourceRecipe = Recipe::with(['categories', 'tags', 'ingredients', 'steps'])
             ->where(function ($q) use ($user) {
                 $q->where('user_id', $user->id)
                   ->orWhere('is_shared', true);
@@ -107,7 +107,7 @@ class RecipeDetail extends Component
     public function getMarkdownContentProperty(): string
     {
         $user = Auth::user();
-        $recipe = Recipe::with(['categories', 'ingredients', 'steps'])
+        $recipe = Recipe::with(['categories', 'tags', 'ingredients', 'steps'])
             ->where(function ($q) use ($user) {
                 $q->where('user_id', $user->id)
                   ->orWhere('is_shared', true);
@@ -136,6 +136,10 @@ class RecipeDetail extends Component
         if ($recipe->categories->isNotEmpty()) {
             $categoriesList = $recipe->categories->pluck('name')->join(', ');
             $md .= "- **Kategorien:** {$categoriesList}\n";
+        }
+        if ($recipe->tags->isNotEmpty()) {
+            $tagsList = $recipe->tags->map(fn($t) => '#' . $t->name)->join(', ');
+            $md .= "- **Schlagwörter:** {$tagsList}\n";
         }
         if ($recipe->calories || $recipe->protein || $recipe->fat || $recipe->carbohydrates) {
             $md .= "- **Nährwerte (pro Portion):** " . implode(', ', array_filter([
@@ -196,7 +200,7 @@ class RecipeDetail extends Component
     {
         $user = Auth::user();
 
-        $recipe = Recipe::with(['categories', 'ingredients', 'steps', 'user', 'favoritedBy'])
+        $recipe = Recipe::with(['categories', 'tags', 'ingredients', 'steps', 'user', 'favoritedBy'])
             ->where(function ($q) use ($user) {
                 $q->where('user_id', $user->id)
                   ->orWhere('is_shared', true);
