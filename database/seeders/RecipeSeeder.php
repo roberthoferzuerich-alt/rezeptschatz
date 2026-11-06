@@ -8,6 +8,7 @@ use App\Models\RecipeIngredient;
 use App\Models\RecipeStep;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class RecipeSeeder extends Seeder
 {
@@ -27,7 +28,7 @@ class RecipeSeeder extends Seeder
         $catMeat = Category::where('id', 'c1000000-0000-0000-0000-000000000007')->first();
 
         // 1. Spinat-Nudelpfanne
-        if (!Recipe::withTrashed()->where('id', 'r1000000-0000-0000-0000-000000000001')->exists()) {
+        if (!DB::table('recipes')->where('id', 'r1000000-0000-0000-0000-000000000001')->exists()) {
             $r1 = Recipe::create([
                 'id' => 'r1000000-0000-0000-0000-000000000001',
                 'user_id' => $user->id,
@@ -70,7 +71,7 @@ class RecipeSeeder extends Seeder
         }
 
         // 2. Ofenrösti mit Bündnerfleisch
-        if (!Recipe::withTrashed()->where('id', 'r1000000-0000-0000-0000-000000000002')->exists()) {
+        if (!DB::table('recipes')->where('id', 'r1000000-0000-0000-0000-000000000002')->exists()) {
             $r2 = Recipe::create([
                 'id' => 'r1000000-0000-0000-0000-000000000002',
                 'user_id' => $user->id,
@@ -112,7 +113,7 @@ class RecipeSeeder extends Seeder
         }
 
         // 3. Cajun-Kartoffelspalten aus dem Airfryer
-        if (!Recipe::withTrashed()->where('id', 'r1000000-0000-0000-0000-000000000003')->exists()) {
+        if (!DB::table('recipes')->where('id', 'r1000000-0000-0000-0000-000000000003')->exists()) {
             $r3 = Recipe::create([
                 'id' => 'r1000000-0000-0000-0000-000000000003',
                 'user_id' => $user->id,
@@ -154,7 +155,7 @@ class RecipeSeeder extends Seeder
         }
 
         // 4. Französischer Kartoffel-Hackfleisch-Auflauf (Hachis Parmentier)
-        if (!Recipe::withTrashed()->where('id', 'r1000000-0000-0000-0000-000000000004')->exists()) {
+        if (!DB::table('recipes')->where('id', 'r1000000-0000-0000-0000-000000000004')->exists()) {
             $r4 = Recipe::create([
                 'id' => 'r1000000-0000-0000-0000-000000000004',
                 'user_id' => $user->id,
@@ -204,7 +205,7 @@ class RecipeSeeder extends Seeder
         }
 
         // 5. Tikka-Masala-Nudeln
-        if (!Recipe::withTrashed()->where('id', 'r1000000-0000-0000-0000-000000000005')->exists()) {
+        if (!DB::table('recipes')->where('id', 'r1000000-0000-0000-0000-000000000005')->exists()) {
             $r5 = Recipe::create([
                 'id' => 'r1000000-0000-0000-0000-000000000005',
                 'user_id' => $user->id,

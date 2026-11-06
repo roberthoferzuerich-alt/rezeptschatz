@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
@@ -62,25 +63,28 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $cat) {
-            $existing = Category::withTrashed()->find($cat['id']);
+            $exists = DB::table('categories')->where('id', $cat['id'])->exists();
 
-            if ($existing) {
-                // Wenn bereits vorhanden (auch soft-deleted), nur Felder aktualisieren, keinen INSERT erzwingen
-                $existing->update([
+            if ($exists) {
+                // Direkter Update auf Tabellenebene – kein doppelter INSERT möglich
+                DB::table('categories')->where('id', $cat['id'])->update([
                     'user_id' => $user->id,
                     'name' => $cat['name'],
                     'icon' => $cat['icon'],
                     'color' => $cat['color'],
                     'server_version' => 1,
+                    'updated_at' => now(),
                 ]);
             } else {
-                Category::create([
+                DB::table('categories')->insert([
                     'id' => $cat['id'],
                     'user_id' => $user->id,
                     'name' => $cat['name'],
                     'icon' => $cat['icon'],
                     'color' => $cat['color'],
                     'server_version' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
         }

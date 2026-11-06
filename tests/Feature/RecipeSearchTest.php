@@ -195,3 +195,4 @@ HTML;
             ->assertSee('Auf Betty Bossi nach „Wähe“ suchen');
     }
 }
+

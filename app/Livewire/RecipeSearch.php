@@ -188,3 +188,4 @@ class RecipeSearch extends Component
         ]);
     }
 }
+
