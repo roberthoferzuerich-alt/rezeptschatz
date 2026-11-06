@@ -65,3 +65,4 @@ class UpdateRecipeNutritionCommand extends Command
         return self::SUCCESS;
     }
 }
+
