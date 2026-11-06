@@ -21,7 +21,7 @@
         <a href="{{ route('recipes.index', ['author' => 'shared']) }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
             Rezepte meiner Freunde
         </a>
-        <a href="{{ route('recipes.index') }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+        <a href="{{ route('recipes.search') }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
             Neues Rezept suchen
         </a>
 
@@ -77,10 +77,10 @@
          class="absolute left-0 mt-1 w-52 bg-white rounded-b-xl shadow-xl border border-stone-200/80 py-2 z-50 text-stone-700"
          style="display: none;">
         <div class="h-0.5 bg-[#8ea92c] -mt-2 mb-1 rounded-t"></div>
-        <a href="{{ route('recipes.index') }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+        <a href="{{ route('recipes.search', ['site' => 'rezeptschatz']) }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
             Im Rezeptschatz suchen
         </a>
-        <a href="{{ route('recipes.import.web') }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition font-semibold text-stone-800">
+        <a href="{{ route('recipes.search', ['site' => 'all']) }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition font-semibold text-stone-800">
             <span>Aus dem Internet (URL)</span>
             <span class="material-symbols-outlined text-[#8ea92c] text-base">public</span>
         </a>

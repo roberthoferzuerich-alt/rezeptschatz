@@ -224,6 +224,10 @@
                 <div class="text-xs uppercase text-stone-400 font-bold px-2 py-1">Rezepte</div>
                 <a href="{{ route('recipes.index') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100">Liste der Rezepte</a>
                 <a href="{{ route('recipes.index', ['author' => 'shared']) }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100">Rezepte meiner Freunde</a>
+                <a href="{{ route('recipes.search') }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100 flex items-center justify-between text-stone-800">
+                    <span>Neues Rezept suchen</span>
+                    <span class="material-symbols-outlined text-[#8ea92c] text-base">search</span>
+                </a>
                 <a href="{{ route('recipes.index', ['fav' => 1]) }}" class="block px-3 py-2 rounded-lg hover:bg-stone-100 flex items-center justify-between">
                     <span>Lesezeichen (Favoriten)</span>
                     <span class="material-symbols-outlined text-amber-500 text-sm">star</span>

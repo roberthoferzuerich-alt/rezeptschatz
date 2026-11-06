@@ -39,3 +39,4 @@ class TagPolicy
         return $user->canManageTags();
     }
 }
+

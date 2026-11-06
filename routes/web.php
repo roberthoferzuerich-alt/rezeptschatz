@@ -12,6 +12,7 @@ use App\Livewire\RecipeForm;
 use App\Livewire\RecipeImport;
 use App\Livewire\RecipeList;
 use App\Livewire\RecipeScanner;
+use App\Livewire\RecipeSearch;
 use App\Livewire\ShoppingList;
 use App\Livewire\TagManager;
 use App\Livewire\WebRecipeImport;
@@ -34,6 +35,7 @@ Route::middleware('auth')->group(function () {
 
     // Rezepte
     Route::get('/recipes', RecipeList::class)->name('recipes.index');
+    Route::get('/recipes/search', RecipeSearch::class)->name('recipes.search');
     Route::get('/recipes/create', RecipeForm::class)->name('recipes.create');
     Route::get('/recipes/scan', RecipeScanner::class)->name('recipes.scan');
     Route::get('/recipes/import', RecipeImport::class)->name('recipes.import');

@@ -62,17 +62,27 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $cat) {
-            Category::updateOrCreate(
-                ['id' => $cat['id']],
-                [
+            $existing = Category::withTrashed()->find($cat['id']);
+
+            if ($existing) {
+                // Wenn bereits vorhanden (auch soft-deleted), nur Felder aktualisieren, keinen INSERT erzwingen
+                $existing->update([
                     'user_id' => $user->id,
                     'name' => $cat['name'],
                     'icon' => $cat['icon'],
                     'color' => $cat['color'],
                     'server_version' => 1,
-                ]
-            );
+                ]);
+            } else {
+                Category::create([
+                    'id' => $cat['id'],
+                    'user_id' => $user->id,
+                    'name' => $cat['name'],
+                    'icon' => $cat['icon'],
+                    'color' => $cat['color'],
+                    'server_version' => 1,
+                ]);
+            }
         }
     }
 }
-

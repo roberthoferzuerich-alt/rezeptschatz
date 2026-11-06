@@ -71,7 +71,10 @@ Die Navigation ist speziell für Tablets zweizeilig und übersichtlich aufgeteil
 - **Logo / Titel:** Führt immer zurück zur Rezeptübersicht.
 - **Benutzerkonto (oben rechts):** Zeigt den angemeldeten Benutzer; erlaubt Passwortänderungen und die Abmeldung.
 - **Rezepte >:** Ihre gesamte Rezeptsammlung mit Schnellfiltern und Suchfunktion.
-- **Neues Rezept suchen >:** Web-Import zum Einlesen von Kochrezepten aus dem Internet.
+- **Neues Rezept suchen >:** Die zentrale Such- und Importmaske im bewährten COOKmate-Design (`/recipes/search`):
+  - **Im Rezeptschatz suchen:** Schnelle Volltextsuche in Ihren eigenen Rezepten, Zutaten und Notizen.
+  - **Aus dem Internet (URL) & Webseiten:** Rezepte im Web suchen (z. B. auf Chefkoch, Betty Bossi, Swissmilk) oder eine direkte Internet-Adresse eingeben und mit 1 Klick importieren.
+  - **Lesezeichen:** Schneller Zugriff auf Ihre Lieblingsrezepte.
 - **Einkaufsliste:** Ihre aktuellen Zutaten und Einkäufe mit Checkboxen zum Abhaken.
 - **Menüplaner:** Wochenplaner für Mahlzeiten von Montag bis Sonntag.
 - **Mehr > (Ausklappmenü):**
@@ -143,20 +146,26 @@ Rezeptschatz bietet vier flexible Möglichkeiten, um neue Gerichte in Ihre Samml
 
 ---
 
-### Weg 2: Web-Rezept-Import (URL)
-*Für Rezepte aus dem Internet (Betty Bossi, Chefkoch, Swissmilk, EatSmarter, etc.).*
+### Weg 2: Neues Rezept suchen / Im Rezeptschatz & Web suchen
+*Die universelle Rezeptsuche nach dem bewährten COOKmate-Muster (`/recipes/search`).*
 
-1. Kopieren Sie den Link des gewünschten Rezepts im Internetbrowser.
-2. Gehen Sie in Rezeptschatz auf **„Neues Rezept suchen >“** (`/recipes/import`).
-3. Fügen Sie die URL in das Textfeld ein und klicken Sie auf **„Rezept importieren“**.
-4. Rezeptschatz liest das standardisierte Schema (`schema.org / Recipe`) der Website aus:
-   - Titel, Bild, Beschreibung
-   - Zubereitungszeiten & Portionen
-   - Vollständige Zutatenliste mit Mengen
-   - Alle Zubereitungsschritte
-   - Nährwerte (falls auf der Quellseite vorhanden)
-5. Sie erhalten eine übersichtliche Vorschau.
-6. Klicken Sie auf **„In Rezeptschatz speichern“** oder verfeinern Sie das Rezept bei Bedarf noch im Editor.
+Die Suchmaske bietet das vertraute Design mit dem grünen Weltkugel-Symbol, praktischen Dropdown-Filtern mit grünem Akzentrand und dem lachsfarbenen **„Suchen“**-Button:
+
+1. **Option A – Stichwortsuche (z. B. „Zürcher Geschnetzeltes“, „Kürbissuppe“):**
+   - Geben Sie den Suchbegriff in das Feld **„Suche oder URL-Eingabe“** ein.
+   - Wählen Sie die **Sprache** (Deutsch, Französisch, Italienisch, Englisch) und die gewünschte **Seite**:
+     - **Eigener Rezeptschatz:** Durchsucht Ihre persönliche Sammlung blitzschnell nach Titeln, Zutaten und Notizen.
+     - **Alle kompatiblen Webseiten / Chefkoch.de:** Durchsucht das Web und listet passende Rezepte als Karten mit Foto, Zubereitungszeit, Schwierigkeitsgrad und Bewertung auf.
+     - **Schweizer Kochportale (Betty Bossi, Swissmilk, Migusto, Fooby, GuteKüche.ch):** Bietet einen 1-Klick-Direktlink zur Rezeptsuche des jeweiligen Portals.
+   - Tippen Sie auf **„Suchen“**.
+   - Bei Web-Treffern genügt ein Klick auf **„📥 In Rezeptschatz importieren“**: Das Rezept wird mit Bild, Zutaten, Zubereitungsschritten und Nährwerten geladen und in der Vorschau angezeigt.
+   - Mit einem Klick auf **„In Rezeptschatz speichern“** ist es dauerhaft in Ihrer Sammlung gesichert!
+
+2. **Option B – Direkte Internet-Adresse (URL):**
+   - Kopieren Sie den Link eines beliebigen Rezepts aus dem Browser (z. B. von Betty Bossi, Swissmilk, Chefkoch, GuteKüche, etc.).
+   - Fügen Sie ihn in das Feld **„Suche oder URL-Eingabe“** ein und klicken Sie auf **„Suchen“**.
+   - Rezeptschatz liest automatisch die strukturierten Daten (`Schema.org / JSON-LD`) aus und zeigt Ihnen die vollständige Vorschau mit Nährwerten und Zutaten.
+   - Klicken Sie auf **„In Rezeptschatz speichern“** oder passen Sie das Rezept vor dem Speichern noch an.
 
 ---
 

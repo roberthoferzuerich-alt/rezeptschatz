@@ -39,3 +39,4 @@ class Tag extends Model
         return $this->belongsToMany(Recipe::class, 'recipe_tag');
     }
 }
+
