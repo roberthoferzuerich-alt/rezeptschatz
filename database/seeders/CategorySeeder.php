@@ -2,11 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
@@ -15,7 +13,10 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::where('email', 'robert.hofer.zuerich@bluewin.ch')->firstOrFail();
+        $user = User::where('email', 'robert.hofer.zuerich@bluewin.ch')->first() ?? User::first();
+        if (!$user) {
+            return;
+        }
 
         $categories = [
             [
@@ -63,30 +64,17 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $cat) {
-            $exists = DB::table('categories')->where('id', $cat['id'])->exists();
-
-            if ($exists) {
-                // Direkter Update auf Tabellenebene – kein doppelter INSERT möglich
-                DB::table('categories')->where('id', $cat['id'])->update([
-                    'user_id' => $user->id,
-                    'name' => $cat['name'],
-                    'icon' => $cat['icon'],
-                    'color' => $cat['color'],
-                    'server_version' => 1,
-                    'updated_at' => now(),
-                ]);
-            } else {
-                DB::table('categories')->insert([
-                    'id' => $cat['id'],
-                    'user_id' => $user->id,
-                    'name' => $cat['name'],
-                    'icon' => $cat['icon'],
-                    'color' => $cat['color'],
-                    'server_version' => 1,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+            // Verwendet INSERT IGNORE auf Datenbank-Ebene: Falls ID existiert (auch gelöscht), wird der Fehler ignoriert
+            DB::table('categories')->insertOrIgnore([
+                'id' => $cat['id'],
+                'user_id' => $user->id,
+                'name' => $cat['name'],
+                'icon' => $cat['icon'],
+                'color' => $cat['color'],
+                'server_version' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
     }
 }
