@@ -21,7 +21,7 @@ class AiRecipeService
      */
     public function getActiveProvider(): ?string
     {
-        $preferred = Cache::get('ai_provider') 
+        $preferred = cache()->get('ai_provider') 
             ?: config('services.ai.provider', env('AI_PROVIDER', 'gemini'));
 
         if ($preferred === 'gemini' && !empty($this->getGeminiKey())) {
