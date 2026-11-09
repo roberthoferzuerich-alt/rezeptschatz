@@ -29,6 +29,13 @@ class RecipeResource extends JsonResource
             'image_hash' => $this->image_hash,
             'server_version' => (int) $this->server_version,
             'category_ids' => $this->categories ? $this->categories->pluck('id')->values()->all() : [],
+            'tag_ids' => $this->tags ? $this->tags->pluck('id')->values()->all() : [],
+            'tags' => $this->tags ? $this->tags->map(fn($t) => [
+                'id' => $t->id,
+                'name' => $t->name,
+                'color' => $t->color,
+                'icon' => $t->icon,
+            ])->values()->all() : [],
             'ingredients' => RecipeIngredientResource::collection($this->whenLoaded('ingredients')),
             'steps' => RecipeStepResource::collection($this->whenLoaded('steps')),
             'created_at' => $this->created_at?->toISOString(),

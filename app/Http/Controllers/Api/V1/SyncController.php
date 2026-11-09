@@ -90,7 +90,7 @@ class SyncController extends Controller
 
         // Rezepte abfragen (inklusive Soft-Deletes)
         $recipeQuery = Recipe::withTrashed()
-            ->with(['categories', 'ingredients', 'steps', 'user', 'favoritedBy'])
+            ->with(['categories', 'tags', 'ingredients', 'steps', 'user', 'favoritedBy'])
             ->where(function ($q) use ($user) {
                 $q->where('user_id', $user->id)
                   ->orWhere('is_shared', true);

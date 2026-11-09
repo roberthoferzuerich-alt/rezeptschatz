@@ -21,7 +21,7 @@ class RecipeController extends Controller
     {
         $user = $request->user();
 
-        $query = Recipe::with(['categories', 'ingredients', 'steps', 'user', 'favoritedBy'])
+        $query = Recipe::with(['categories', 'tags', 'ingredients', 'steps', 'user', 'favoritedBy'])
             ->where(function ($q) use ($user) {
                 $q->where('user_id', $user->id)
                   ->orWhere('is_shared', true);
@@ -70,7 +70,7 @@ class RecipeController extends Controller
     {
         $this->authorize('view', $recipe);
 
-        $recipe->load(['categories', 'ingredients', 'steps', 'user', 'favoritedBy']);
+        $recipe->load(['categories', 'tags', 'ingredients', 'steps', 'user', 'favoritedBy']);
 
         return response()->json([
             'success' => true,
@@ -99,6 +99,8 @@ class RecipeController extends Controller
             'is_shared' => ['boolean'],
             'category_ids' => ['array'],
             'category_ids.*' => ['uuid', 'exists:categories,id'],
+            'tag_ids' => ['nullable', 'array'],
+            'tag_ids.*' => ['uuid', 'exists:tags,id'],
             'ingredients' => ['array'],
             'ingredients.*.id' => ['nullable', 'uuid'],
             'ingredients.*.sort_order' => ['nullable', 'integer'],
@@ -141,6 +143,8 @@ class RecipeController extends Controller
             'is_shared' => ['boolean'],
             'category_ids' => ['array'],
             'category_ids.*' => ['uuid', 'exists:categories,id'],
+            'tag_ids' => ['nullable', 'array'],
+            'tag_ids.*' => ['uuid', 'exists:tags,id'],
             'ingredients' => ['array'],
             'ingredients.*.id' => ['nullable', 'uuid'],
             'ingredients.*.sort_order' => ['nullable', 'integer'],
