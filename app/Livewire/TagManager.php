@@ -115,9 +115,10 @@ class TagManager extends Component
     {
         $user = Auth::user();
 
-        $query = Tag::withCount(['recipes' => function ($rq) use ($user) {
-            $rq->where('user_id', $user->id)->orWhere('is_shared', true);
-        }]);
+        $query = Tag::where('user_id', $user->id)
+            ->withCount(['recipes' => function ($rq) use ($user) {
+                $rq->where('user_id', $user->id)->orWhere('is_shared', true);
+            }]);
 
         if (!empty(trim($this->search))) {
             $query->where('name', 'like', '%' . trim($this->search) . '%');

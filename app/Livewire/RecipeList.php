@@ -192,9 +192,10 @@ class RecipeList extends Component
             $rq->where('user_id', $userId)->orWhere('is_shared', true);
         }])->orderBy('name')->get();
 
-        $tags = Tag::withCount(['recipes' => function ($rq) use ($userId) {
-            $rq->where('user_id', $userId)->orWhere('is_shared', true);
-        }])->orderBy('name')->get();
+        $tags = Tag::where('user_id', $userId)
+            ->withCount(['recipes' => function ($rq) use ($userId) {
+                $rq->where('user_id', $userId)->orWhere('is_shared', true);
+            }])->orderBy('name')->get();
 
         $selectedTagModel = !empty($this->selectedTag) ? Tag::find($this->selectedTag) : null;
 
