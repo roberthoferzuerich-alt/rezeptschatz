@@ -291,7 +291,7 @@ class RecipeNutritionCalculator extends Component
                 }
 
                 session()->flash('success', "Nährwerte für „{$recipe->title}“ wurden erfolgreich in der Datenbank gespeichert!");
-                return $this->redirectRoute('recipes.show', $recipe->id, navigate: true);
+                return $this->redirectRoute('recipes.show', ['id' => $recipe->id], navigate: true);
             } elseif ($this->recipeData['type'] === 'external') {
                 // Bei externen Rezepten wird das Rezept importiert und mit den Nährwerten gespeichert
                 $parsed = [
@@ -327,7 +327,7 @@ class RecipeNutritionCalculator extends Component
                 }
 
                 session()->flash('success', "Rezept „{$recipe->title}“ wurde mit den Nährwerten erfolgreich gespeichert!");
-                return $this->redirectRoute('recipes.show', $recipe->id, navigate: true);
+                return $this->redirectRoute('recipes.show', ['id' => $recipe->id], navigate: true);
             }
         } catch (\Throwable $e) {
             $this->errorMessage = 'Fehler beim Speichern in die Datenbank: ' . $e->getMessage();
