@@ -365,3 +365,4 @@ class AssignTagsCommand extends Command
         return false;
     }
 }
+

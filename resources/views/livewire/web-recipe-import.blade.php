@@ -106,6 +106,7 @@
                             <li><a href="https://www.chefkoch.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Chefkoch.de ↗</a></li>
                             <li><a href="https://www.essen-und-trinken.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Essen & Trinken ↗</a></li>
                             <li><a href="https://www.lecker.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Lecker.de ↗</a></li>
+                            <li><a href="https://www.leckerschmecker.me" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Leckerschmecker ↗</a></li>
                             <li><a href="https://www.kuechengoetter.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Küchengötter ↗</a></li>
                             <li><a href="https://www.einfachbacken.de" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">Einfach Backen ↗</a></li>
                             <li><a href="https://www.gutekueche.at" target="_blank" rel="noopener" class="hover:text-[#8ea92c] transition hover:underline">GuteKüche Österreich ↗</a></li>

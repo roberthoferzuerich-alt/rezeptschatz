@@ -337,7 +337,7 @@ class WebRecipeImportService
 
         $title = trim(html_entity_decode(strip_tags($titleMatch[1])));
         // Webseitennamen wie " | Betty Bossi" oder " - Chefkoch.de" entfernen
-        $title = preg_replace('/\s*[-|–]\s*(Betty Bossi|Chefkoch|Swissmilk|GuteKueche|Lecker).*$/i', '', $title);
+        $title = preg_replace('/\s*[-|–]\s*(Betty Bossi|Chefkoch|Swissmilk|GuteKueche|Lecker|Leckerschmecker).*$/i', '', $title);
 
         preg_match('/<meta\b[^>]*property=["\']og:description["\'][^>]*content=["\']([^"\']*)["\']/i', $html, $descMatch);
         $description = !empty($descMatch[1]) ? trim(html_entity_decode($descMatch[1])) : '';

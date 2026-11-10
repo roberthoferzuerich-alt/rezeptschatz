@@ -522,6 +522,271 @@ JSON;
     }
 
     /**
+     * Schätzt oder berechnet die Nährwerte (Kalorien, Kohlenhydrate, Fett, Eiweiss) pro Portion
+     * für ein Rezept anhand von Titel, Portionen und Zutaten.
+     *
+     * @param string $title
+     * @param int $portions
+     * @param array $ingredients Array von RecipeIngredient Models, Arrays oder Strings
+     * @return array ['calories' => int, 'carbohydrates' => float, 'fat' => float, 'protein' => float, 'source' => string]
+     */
+    public function estimateNutrition(string $title, int $portions, array $ingredients): array
+    {
+        $portions = max(1, $portions);
+
+        // 1. Zutaten formatieren
+        $ingredientsList = [];
+        foreach ($ingredients as $ing) {
+            if (is_string($ing)) {
+                $ingredientsList[] = "- {$ing}";
+            } elseif (is_array($ing) || is_object($ing)) {
+                $name = is_array($ing) ? ($ing['name'] ?? '') : ($ing->name ?? '');
+                $amount = is_array($ing)
+                    ? ($ing['amount_text'] ?? trim(($ing['amount_numeric'] ?? '') . ' ' . ($ing['unit'] ?? '')))
+                    : ($ing->amount_text ?? trim(($ing->amount_numeric ?? '') . ' ' . ($ing->unit ?? '')));
+                $ingredientsList[] = "- " . trim("{$amount} {$name}");
+            }
+        }
+        $ingredientsText = implode("\n", $ingredientsList);
+
+        // 2. Falls KI konfiguriert ist, per Gemini / OpenAI anfragen
+        if ($this->isConfigured()) {
+            try {
+                $prompt = "Du bist ein erfahrener Ernährungsberater und Lebensmittelchemiker.\n"
+                    . "Berechne bitte präzise und realistische Nährwerte PRO PORTION für folgendes Rezept:\n\n"
+                    . "Rezepttitel: {$title}\n"
+                    . "Anzahl Portionen: {$portions}\n"
+                    . "Zutaten für das Gesamtrezept:\n{$ingredientsText}\n\n"
+                    . "WICHTIGE ANWEISUNGEN:\n"
+                    . "- Berechne die Nährwerte PRO PORTION (Gesamtnährwerte geteilt durch {$portions}).\n"
+                    . "- Antworte AUSSCHLIESSLICH als valides JSON ohne Markdown oder Zusatztext:\n"
+                    . "{\n"
+                    . '  "calories": 450,' . "\n"
+                    . '  "carbohydrates": 38.5,' . "\n"
+                    . '  "fat": 14.2,' . "\n"
+                    . '  "protein": 21.0' . "\n"
+                    . "}";
+
+                $provider = $this->getActiveProvider();
+                $nutritionData = null;
+
+                if ($provider === 'gemini') {
+                    $apiKey = $this->getGeminiKey();
+                    $primaryModel = $this->resolveGeminiModel($apiKey);
+                    $modelsToTry = array_values(array_unique(array_filter([
+                        $primaryModel,
+                        'gemini-3-flash-preview',
+                        'gemini-3.8-flash',
+                        'gemini-3.7-flash',
+                        'gemini-3.5-flash',
+                    ])));
+
+                    $payload = [
+                        'contents' => [
+                            ['parts' => [['text' => $prompt]]],
+                        ],
+                        'generationConfig' => [
+                            'response_mime_type' => 'application/json',
+                            'temperature' => 0.2,
+                        ],
+                    ];
+
+                    foreach ($modelsToTry as $model) {
+                        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+                        $response = Http::withOptions([
+                            'verify' => false,
+                            'force_ip_resolve' => 'v4',
+                        ])->timeout(20)->post($url, $payload);
+
+                        if ($response->successful()) {
+                            $data = $response->json();
+                            $rawJson = $data['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
+                            $parsed = json_decode($rawJson, true);
+                            if (is_array($parsed) && isset($parsed['calories'])) {
+                                $nutritionData = $parsed;
+                                break;
+                            }
+                        }
+                    }
+                } elseif ($provider === 'openai') {
+                    $response = Http::withOptions([
+                        'verify' => false,
+                    ])->withToken($this->getOpenAiKey())
+                      ->timeout(20)
+                      ->post('https://api.openai.com/v1/chat/completions', [
+                          'model' => 'gpt-4o-mini',
+                          'messages' => [
+                              ['role' => 'system', 'content' => 'Du bist ein präziser Nährwertrechner. Gib nur JSON zurück.'],
+                              ['role' => 'user', 'content' => $prompt],
+                          ],
+                          'response_format' => ['type' => 'json_object'],
+                          'temperature' => 0.2,
+                      ]);
+
+                    if ($response->successful()) {
+                        $rawJson = $response->json('choices.0.message.content') ?? '{}';
+                        $parsed = json_decode($rawJson, true);
+                        if (is_array($parsed) && isset($parsed['calories'])) {
+                            $nutritionData = $parsed;
+                        }
+                    }
+                }
+
+                if ($nutritionData && isset($nutritionData['calories'])) {
+                    return [
+                        'calories' => (int) round((float) $nutritionData['calories']),
+                        'carbohydrates' => (float) round((float) ($nutritionData['carbohydrates'] ?? 0), 1),
+                        'fat' => (float) round((float) ($nutritionData['fat'] ?? 0), 1),
+                        'protein' => (float) round((float) ($nutritionData['protein'] ?? 0), 1),
+                        'source' => "KI ({$provider})",
+                    ];
+                }
+            } catch (\Throwable $e) {
+                Log::warning("Fehler bei KI-Nährwertberechnung: " . $e->getMessage());
+            }
+        }
+
+        // 3. Fallback: Heuristische Nährwertberechnung
+        return $this->calculateHeuristicNutrition($portions, $ingredients);
+    }
+
+    /**
+     * Heuristische Schätzung der Nährwerte anhand von Zutatenmengen und Referenztabelle.
+     */
+    public function calculateHeuristicNutrition(int $portions, array $ingredients): array
+    {
+        $portions = max(1, $portions);
+
+        $totalCalories = 0.0;
+        $totalCarbs = 0.0;
+        $totalFat = 0.0;
+        $totalProtein = 0.0;
+
+        foreach ($ingredients as $ing) {
+            $name = '';
+            $amount = 0.0;
+            $unit = '';
+
+            if (is_string($ing)) {
+                $name = $ing;
+                if (preg_match('/^([\d\.,]+)\s*([a-zA-ZäöüÄÖÜß]+)?\s+(.+)$/u', trim($ing), $m)) {
+                    $amount = (float) str_replace(',', '.', $m[1]);
+                    $unit = strtolower($m[2] ?? '');
+                    $name = $m[3];
+                }
+            } elseif (is_array($ing) || is_object($ing)) {
+                $name = is_array($ing) ? ($ing['name'] ?? '') : ($ing->name ?? '');
+                $amount = (float) (is_array($ing) ? ($ing['amount_numeric'] ?? 0) : ($ing->amount_numeric ?? 0));
+                $unit = strtolower((string) (is_array($ing) ? ($ing['unit'] ?? '') : ($ing->unit ?? '')));
+
+                if ($amount <= 0) {
+                    $text = is_array($ing) ? ($ing['amount_text'] ?? '') : ($ing->amount_text ?? '');
+                    if (preg_match('/([\d\.,]+)/', $text, $m)) {
+                        $amount = (float) str_replace(',', '.', $m[1]);
+                    }
+                }
+            }
+
+            $nameLower = mb_strtolower($name);
+
+            // Gewicht in Gramm schätzen
+            $grams = 0.0;
+            if (in_array($unit, ['g', 'gramm', 'gr'])) {
+                $grams = $amount;
+            } elseif (in_array($unit, ['kg', 'kilogramm'])) {
+                $grams = $amount * 1000.0;
+            } elseif (in_array($unit, ['ml', 'milliliter'])) {
+                $grams = $amount; // Näherung 1ml ~ 1g
+            } elseif (in_array($unit, ['dl', 'deziliter'])) {
+                $grams = $amount * 100.0;
+            } elseif (in_array($unit, ['l', 'liter'])) {
+                $grams = $amount * 1000.0;
+            } elseif (in_array($unit, ['el', 'esslöffel', 'tbsp'])) {
+                $grams = $amount * 12.0;
+            } elseif (in_array($unit, ['tl', 'teelöffel', 'tsp'])) {
+                $grams = $amount * 5.0;
+            } elseif (in_array($unit, ['prise', 'spritzer'])) {
+                $grams = 1.0;
+            } elseif (in_array($unit, ['stk', 'stück', 'stueck', 'stk.']) || empty($unit)) {
+                if (str_contains($nameLower, 'ei')) {
+                    $grams = $amount > 0 ? $amount * 55.0 : 55.0;
+                } elseif (str_contains($nameLower, 'zwiebel')) {
+                    $grams = $amount > 0 ? $amount * 90.0 : 90.0;
+                } elseif (str_contains($nameLower, 'knoblauch')) {
+                    $grams = $amount > 0 ? $amount * 4.0 : 4.0;
+                } elseif (str_contains($nameLower, 'zucchini')) {
+                    $grams = $amount > 0 ? $amount * 200.0 : 200.0;
+                } elseif (str_contains($nameLower, 'paprika')) {
+                    $grams = $amount > 0 ? $amount * 160.0 : 160.0;
+                } elseif (str_contains($nameLower, 'karotte') || str_contains($nameLower, 'rüebli')) {
+                    $grams = $amount > 0 ? $amount * 80.0 : 80.0;
+                } else {
+                    $grams = $amount > 0 ? $amount * 100.0 : 100.0;
+                }
+            } else {
+                $grams = $amount > 0 ? $amount : 100.0;
+            }
+
+            // Nährwerte pro 100g [kcal, carbs, fat, protein]
+            $profile = [50.0, 5.0, 1.0, 2.0]; // Standard Gemüse/neutral
+
+            if (str_contains($nameLower, 'öl') || str_contains($nameLower, 'olivenöl') || str_contains($nameLower, 'rapsöl')) {
+                $profile = [884.0, 0.0, 100.0, 0.0];
+            } elseif (str_contains($nameLower, 'butter')) {
+                $profile = [717.0, 0.7, 81.0, 0.8];
+            } elseif (str_contains($nameLower, 'couscous') || str_contains($nameLower, 'bulgur')) {
+                $profile = [350.0, 72.0, 1.5, 12.0];
+            } elseif (str_contains($nameLower, 'reis')) {
+                $profile = [355.0, 78.0, 0.7, 7.0];
+            } elseif (str_contains($nameLower, 'nudel') || str_contains($nameLower, 'pasta') || str_contains($nameLower, 'spaghetti') || str_contains($nameLower, 'teigwaren')) {
+                $profile = [360.0, 71.0, 1.5, 12.0];
+            } elseif (str_contains($nameLower, 'mehl')) {
+                $profile = [345.0, 70.0, 1.2, 10.0];
+            } elseif (str_contains($nameLower, 'zucker') || str_contains($nameLower, 'honig')) {
+                $profile = [390.0, 98.0, 0.0, 0.0];
+            } elseif (str_contains($nameLower, 'hackfleisch') || str_contains($nameLower, 'rind')) {
+                $profile = [240.0, 0.0, 16.0, 21.0];
+            } elseif (str_contains($nameLower, 'hähnchen') || str_contains($nameLower, 'poulet') || str_contains($nameLower, 'hühner')) {
+                $profile = [120.0, 0.0, 2.0, 24.0];
+            } elseif (str_contains($nameLower, 'fisch') || str_contains($nameLower, 'lachs')) {
+                $profile = [200.0, 0.0, 13.0, 20.0];
+            } elseif (str_contains($nameLower, 'käse') || str_contains($nameLower, 'parmesan') || str_contains($nameLower, 'mozzarella')) {
+                $profile = [330.0, 2.0, 26.0, 25.0];
+            } elseif (str_contains($nameLower, 'sahne') || str_contains($nameLower, 'rahm')) {
+                $profile = [300.0, 3.2, 30.0, 2.4];
+            } elseif (str_contains($nameLower, 'milch')) {
+                $profile = [64.0, 4.8, 3.5, 3.3];
+            } elseif (str_contains($nameLower, 'ei') && !str_contains($nameLower, 'teig')) {
+                $profile = [145.0, 0.7, 10.0, 13.0];
+            } elseif (str_contains($nameLower, 'linse') || str_contains($nameLower, 'bohne') || str_contains($nameLower, 'kichererbse')) {
+                $profile = [115.0, 17.0, 0.6, 8.0];
+            } elseif (str_contains($nameLower, 'nuss') || str_contains($nameLower, 'mandel')) {
+                $profile = [600.0, 10.0, 52.0, 20.0];
+            } elseif (str_contains($nameLower, 'kartoffel')) {
+                $profile = [77.0, 17.0, 0.1, 2.0];
+            } elseif (str_contains($nameLower, 'tomate') || str_contains($nameLower, 'passata')) {
+                $profile = [20.0, 3.9, 0.2, 0.9];
+            } elseif (str_contains($nameLower, 'zucchini') || str_contains($nameLower, 'paprika') || str_contains($nameLower, 'karotte') || str_contains($nameLower, 'brokkoli')) {
+                $profile = [28.0, 5.0, 0.3, 1.8];
+            }
+
+            $factor = $grams / 100.0;
+            $totalCalories += $profile[0] * $factor;
+            $totalCarbs += $profile[1] * $factor;
+            $totalFat += $profile[2] * $factor;
+            $totalProtein += $profile[3] * $factor;
+        }
+
+        return [
+            'calories' => (int) round($totalCalories / $portions),
+            'carbohydrates' => (float) round($totalCarbs / $portions, 1),
+            'fat' => (float) round($totalFat / $portions, 1),
+            'protein' => (float) round($totalProtein / $portions, 1),
+            'source' => 'Heuristische Schätzung',
+        ];
+    }
+
+    /**
      * Speichert einen API-Schlüssel in der lokalen .env-Datei.
      */
     public function updateEnvKey(string $keyName, string $keyValue): bool
