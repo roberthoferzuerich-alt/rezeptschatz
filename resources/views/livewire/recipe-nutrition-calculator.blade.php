@@ -289,6 +289,7 @@
                     <button type="button" 
                             wire:click="commit" 
                             wire:loading.attr="disabled"
+                            wire:target="commit"
                             class="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-2.5 bg-[#8ea92c] hover:bg-[#7c9526] text-white text-sm font-bold rounded-lg shadow-sm transition disabled:opacity-50 cursor-pointer">
                         <span wire:loading.remove wire:target="commit" class="material-symbols-outlined text-base">save</span>
                         <span wire:loading wire:target="commit" class="material-symbols-outlined text-base animate-spin">progress_activity</span>

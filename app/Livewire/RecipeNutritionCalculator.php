@@ -290,8 +290,8 @@ class RecipeNutritionCalculator extends Component
                     }
                 }
 
-                session()->flash('success', "Nährwerte für „{$recipe->title}“ wurden erfolgreich in der Datenbank gespeichert!");
-                return $this->redirectRoute('recipes.show', ['id' => $recipe->id], navigate: true);
+                session()->flash('success', "Nährwerte für „{$recipe->title}“ wurden erfolgreich gespeichert und die Zutaten-Kategorien wurden zugewiesen!");
+                return redirect()->route('recipes.index');
             } elseif ($this->recipeData['type'] === 'external') {
                 // Bei externen Rezepten wird das Rezept importiert und mit den Nährwerten gespeichert
                 $parsed = [
@@ -327,7 +327,7 @@ class RecipeNutritionCalculator extends Component
                 }
 
                 session()->flash('success', "Rezept „{$recipe->title}“ wurde mit den Nährwerten erfolgreich gespeichert!");
-                return $this->redirectRoute('recipes.show', ['id' => $recipe->id], navigate: true);
+                return redirect()->route('recipes.index');
             }
         } catch (\Throwable $e) {
             $this->errorMessage = 'Fehler beim Speichern in die Datenbank: ' . $e->getMessage();
@@ -337,19 +337,11 @@ class RecipeNutritionCalculator extends Component
     }
 
     /**
-     * Abbrechen: Setzt das Formular zurück
+     * Abbrechen: Leitet zurück zur Hauptseite (Rezeptübersicht)
      */
-    public function cancel(): void
+    public function cancel()
     {
-        $this->recipeData = null;
-        $this->errorMessage = null;
-        $this->successMessage = null;
-        $this->calories = null;
-        $this->carbohydrates = null;
-        $this->fat = null;
-        $this->protein = null;
-        $this->isSaving = false;
-        $this->isGenerating = false;
+        return redirect()->route('recipes.index');
     }
 
     public function render()
