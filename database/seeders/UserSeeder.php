@@ -22,5 +22,25 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        User::updateOrCreate(
+            ['email' => 'annemarie.hofer@bluewin.ch'],
+            [
+                'name' => 'Annemarie Hofer',
+                'role' => 'member',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'lucienne.hofer@bluewin.ch'],
+            [
+                'name' => 'Lucienne Hofer',
+                'role' => 'member',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
     }
 }
