@@ -2,7 +2,7 @@
 
 Willkommen beim offiziellen Benutzerhandbuch für **Rezeptschatz**, Ihrem privaten, selbstgehosteten Rezeptverwaltungs- und Kochsystem.
 
-Rezeptschatz wurde für den modernen Kochalltag entwickelt: Ob auf dem Laptop am Schreibtisch oder auf dem Tablet in der Küche – alle Ihre Rezepte, Menüpläne und Einkäufe sind jederzeit blitzschnell verfügbar.
+Rezeptschatz wurde für den modernen Kochalltag entwickelt: Ob auf dem Laptop am Schreibtisch, auf dem Tablet in der Küche oder auf dem Smartphone unterwegs – alle Ihre Rezepte, Menüpläne und Einkäufe sind jederzeit blitzschnell verfügbar.
 
 ---
 
@@ -16,32 +16,44 @@ Rezeptschatz wurde für den modernen Kochalltag entwickelt: Ob auf dem Laptop am
    - [Die Rezeptansicht](#die-rezeptansicht)
    - [Dynamischer Portionsrechner](#dynamischer-portionsrechner)
    - [Druckansicht & PDF-Export](#druckansicht--pdf-export)
-5. [Die 4 Wege für neue Rezepte](#5-die-4-wege-für-neue-rezepte)
+5. [Die Wege für neue Rezepte](#5-die-wege-für-neue-rezepte)
    - [Weg 1: Rezept manuell erfassen](#weg-1-rezept-manuell-erfassen)
-   - [Weg 2: Web-Rezept-Import (URL)](#weg-2-web-rezept-import-url)
+   - [Weg 2: Web-Rezept-Import & Suche (inkl. Leckerschmecker.de)](#weg-2-neues-rezept-suchen--im-rezeptschatz--web-suchen)
    - [Weg 3: 📷 Kochbuch-Scan (OCR)](#weg-3--kochbuch-scan-ocr)
-   - [Weg 4: 🤖 Mit KI & Kühlschrank kochen](#weg-4--mit-ki--kühlschrank-kochen-foto-scan)
-6. [Einkaufsliste](#6-einkaufsliste)
-7. [Menüplaner](#7-menüplaner)
-8. [Kategorien verwalten](#8-kategorien-verwalten)
-9. [Administration & Server-Befehle (Raspberry Pi)](#9-administration--server-befehle-raspberry-pi)
+   - [Weg 4: 🤖 Mit KI & Kühlschrank kochen (Foto-Scan)](#weg-4--mit-ki--kühlschrank-kochen-foto-scan)
+6. [🥑 Nährwerte ermitteln & Kategorien zuweisen (KI-Rechner)](#6--nährwerte-ermitteln--kategorien-zuweisen-ki-rechner)
+   - [Aufruf & Eingabe](#aufruf--eingabe)
+   - [Automatische KI-Berechnung & Zutaten-Kategorien](#automatische-ki-berechnung--zutaten-kategorien)
+   - [Nährwerte überprüfen, anpassen & Commit](#nährwerte-überprüfen-anpassen--commit)
+7. [Einkaufsliste](#7-einkaufsliste)
+8. [Menüplaner](#8-menüplaner)
+9. [Kategorien & Schlagwörter verwalten](#9-kategorien--schlagwörter-verwalten)
+10. [📱 Mobile Flutter-App: Synchronisation & Offline-Nutzung](#10--mobile-flutter-app-synchronisation--offline-nutzung)
+    - [Neues hellblaues App-Icon](#neues-hellblaues-app-icon)
+    - [Rezepte aus der Datenbank aktualisieren (Sync)](#rezepte-aus-der-datenbank-aktualisieren-sync)
+    - [Offline-Fähigkeit in der Küche](#offline-fähigkeit-in-der-küche)
+11. [Administration & Server-Befehle (Raspberry Pi)](#11-administration--server-befehle-raspberry-pi)
+    - [Software-Aktualisierung (Git Pull)](#software-aktualisierung-git-pull)
+    - [Neuer Nährwert-Konsolenbefehl (`get:nutritional-val`)](#neuer-nährwert-konsolenbefehl-getnutritional-val)
+    - [Dateirechte & Berechtigungen (`www-data`)](#dateirechte--berechtigungen-www-data)
+    - [Caches leeren & Wartung](#caches-leeren--wartung)
 
 ---
 
 ## 1. Überblick & Architektur
 
-Rezeptschatz kombiniert ein modernes Web-Frontend (Laravel, Livewire, Tailwind CSS) mit einer robusten MySQL-Datenbank.
+Rezeptschatz kombiniert ein modernes Web-Frontend (Laravel, Livewire, Tailwind CSS) mit einer robusten MySQL/MariaDB-Datenbank und einer nativen Flutter-App.
 
 - **Entwicklungsumgebung:** Windows-Laptop mit Laragon (`http://Rezeptschatz.test:8081`).
-- **Produktionsserver:** Raspberry Pi 5 zu Hause im 24/7-Betrieb (`https://rhz.internet-box.ch:8449`).
-- **Bedienung:** Optimiert für Touchscreens (Samsung Galaxy Tablet), Smartphones und Desktop-Browser.
-- **Künstliche Intelligenz:** Integrierte multimodale Bild- und Texterkennung über Google Gemini (`gemini-3-flash-preview`).
+- **Produktionsserver:** Raspberry Pi zu Hause im 24/7-Betrieb (`https://rhz.internet-box.ch:8449`).
+- **Bedienung:** Optimiert für Touchscreens (Samsung Galaxy Tablet), Smartphones (Flutter & PWA) und Desktop-Browser.
+- **Künstliche Intelligenz:** Integrierte multimodale Bild- und Texterkennung sowie Nährwertanalyse über Google Gemini (`gemini-3-flash-preview`).
 
 ---
 
 ## 2. Erste Schritte & PWA-Installation (Tablet & Smartphone)
 
-Rezeptschatz ist als **Progressive Web App (PWA)** konzipiert. Sie können die Anwendung wie eine echte native App auf Ihrem Tablet installieren – ohne störende Browser-Adressleiste und im praktischen Vollbildmodus.
+Rezeptschatz ist als **Progressive Web App (PWA)** konzipiert. Sie können die Web-Anwendung wie eine native App auf Ihrem Tablet installieren – ohne störende Browser-Adressleiste und im Vollbildmodus.
 
 ### Installation auf dem Samsung / Android Tablet:
 1. Öffnen Sie Google Chrome auf Ihrem Tablet.
@@ -51,13 +63,13 @@ Rezeptschatz ist als **Progressive Web App (PWA)** konzipiert. Sie können die A
 5. Wählen Sie **„App installieren“** oder **„Zum Startbildschirm hinzufügen“**.
 6. Bestätigen Sie mit **„Installieren“**.
 
-Ab sofort finden Sie das grüne Rezeptschatz-Icon auf Ihrem Startbildschirm und öffnen die Anwendung mit einem einzigen Fingertipp.
+Ab sofort finden Sie das Rezeptschatz-Icon auf Ihrem Startbildschirm und öffnen die Anwendung mit einem Fingertipp.
 
 ---
 
 ## 3. Navigation & Benutzeroberfläche
 
-Die Navigation ist speziell für Tablets zweizeilig und übersichtlich aufgeteilt:
+Die Navigation ist übersichtlich aufgeteilt:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -69,19 +81,20 @@ Die Navigation ist speziell für Tablets zweizeilig und übersichtlich aufgeteil
 ```
 
 - **Logo / Titel:** Führt immer zurück zur Rezeptübersicht.
-- **Benutzerkonto (oben rechts):** Zeigt den angemeldeten Benutzer; erlaubt Passwortänderungen und die Abmeldung.
-- **Rezepte >:** Ihre gesamte Rezeptsammlung mit Schnellfiltern und Suchfunktion.
-- **Neues Rezept suchen >:** Die zentrale Such- und Importmaske im bewährten COOKmate-Design (`/recipes/search`):
+- **Benutzerkonto (oben rechts):** Zeigt den angemeldeten Benutzer; erlaubt Passwortänderungen, KI-Einstellungen und Abmeldung.
+- **Rezepte > (Ausklappmenü):**
+  - **Liste der Rezepte:** Ihre gesamte Rezeptsammlung mit Schnellfiltern und Suchfunktion.
+  - **Rezepte meiner Freunde:** Geteilte Rezepte anderer Benutzer.
+  - **Rezept erstellen:** Ein neues Rezept von Hand erfassen.
+  - **🥑 Nährwerte ermitteln (KI):** URL oder ID eingeben, Nährwerte berechnen und Zutatenkategorien automatisch zuweisen.
+  - **Importiere Rezepte:** Webseiten-Import oder COOKmate-Backup einlesen.
+  - **Kategorien & Schlagwörter:** Verwaltung der Hauptzutaten und Tag-Filter.
+- **Neues Rezept suchen >:**
   - **Im Rezeptschatz suchen:** Schnelle Volltextsuche in Ihren eigenen Rezepten, Zutaten und Notizen.
-  - **Aus dem Internet (URL) & Webseiten:** Rezepte im Web suchen (z. B. auf Chefkoch, Betty Bossi, Swissmilk) oder eine direkte Internet-Adresse eingeben und mit 1 Klick importieren.
+  - **Aus dem Internet (URL) & Webseiten:** Rezepte im Web suchen (z. B. auf Chefkoch, Betty Bossi, Swissmilk, Leckerschmecker) oder eine direkte Internet-Adresse eingeben und mit 1 Klick importieren.
   - **Lesezeichen:** Schneller Zugriff auf Ihre Lieblingsrezepte.
 - **Einkaufsliste:** Ihre aktuellen Zutaten und Einkäufe mit Checkboxen zum Abhaken.
 - **Menüplaner:** Wochenplaner für Mahlzeiten von Montag bis Sonntag.
-- **Mehr > (Ausklappmenü):**
-  - **📷 Rezept scannen:** Gedruckte Rezepte per Foto/OCR digitalisieren.
-  - **🤖 Mit KI & Kühlschrank kochen:** Foto des Kühlschranks analysieren und Menü kreieren.
-  - **COOKmate-Import:** Vorhandene Sicherungsdateien importieren.
-  - **Kategorien verwalten:** Farben und Schlagwörter für Rezeptkategorien anpassen.
 
 ---
 
@@ -91,36 +104,25 @@ Die Navigation ist speziell für Tablets zweizeilig und übersichtlich aufgeteil
 Auf der Hauptseite (`/recipes`) finden Sie jedes Gericht in Sekundenschnelle:
 - **Echtzeit-Suchfeld:** Tippen Sie beliebige Wörter ein (z. B. *„Hackfleisch“*, *„Risotto“*, *„Zitronen“*). Das System durchsucht Titel, Beschreibung und alle Zutaten live beim Tippen.
 - **Kategorie-Buttons:** Ein Klick auf *„Fleisch“*, *„Geflügel“*, *„Fisch“*, *„Teigwaren“*, *„Gemüse“*, *„Käse“* etc. filtert die Liste sofort.
+- **Schlagwörter / Tags:** Filter-Chips wie `#Schnell`, `#Gäste & Fest`, `#Backofen` grenzen die Treffer weiter ein.
 - **Favoriten-Filter (⭐):** Zeigt ausschliesslich Ihre Lieblingsrezepte an.
 - **Sortierung:** Wechseln Sie zwischen *„Neueste zuerst“*, *„Titel (A–Z)“* oder *„Zubereitungszeit“*.
 
 ### Die Rezeptansicht
 Tippen Sie auf eine Rezeptkarte, um die Kochansicht zu öffnen:
 - **Grosses Rezeptbild:** Appetitliche Darstellung des fertigen Gerichts.
-- **Zeiten:** Übersicht über Vorbereitungszeit, Kochzeit und Ruhezeit.
-- **Nährwerte pro Portion:** Kalorien (kcal), Kohlenhydrate (g), Fett (g) und Eiweiss (g).
-- **Zutatenliste:** Mit interaktiven Checkboxen. Beim Kochen können Sie jede Zutat abhaken, sobald sie in der Schüssel oder im Topf gelandet ist.
-- **Zubereitungsschritte:** Grosse, gut lesbare Nummerierung der Einzelschritte.
-- **Notizen:** Persönliche Tipps, Weinempfehlungen oder Backofeneinstellungen.
-
-### Dynamischer Portionsrechner
-Kochen Sie heute für 2, 4 oder 8 Personen?
-- Nutzen Sie die **`+`** und **`-`** Buttons direkt neben der Portionsangabe.
-- **Alle Mengenangaben der Zutaten rechnen sich in Echtzeit exakt um!**
-- Auch Bruch- und Dezimalmengen (z. B. `250 g` ➔ `500 g` oder `1.5 EL` ➔ `3 EL`) bleiben mathematisch präzise.
-
-### Zutaten mit 1 Klick zur Einkaufsliste
-- Tippen Sie in der Rezeptansicht auf **„Zur Einkaufsliste hinzufügen“**.
-- Alle benötigten Zutaten (mit der aktuell eingestellten Portionsmenge!) werden automatisch auf Ihre Einkaufsliste übertragen.
-
-### Druckansicht & PDF-Export
-- Tippen Sie oben rechts auf das Drucker-Symbol (**🖨️ Drucken**).
-- Es öffnet sich eine druckeroptimierte Seite ohne störende Menüs und ohne dunkle Hintergründe.
-- Ideal zum Ausdrucken auf Papier oder zum Abspeichern als PDF.
+- **Zeiten:** Vorbereitungszeit, Kochzeit und Ruhezeit.
+- **Nährwerte-Leiste pro Portion:**
+  - Kalorien (kcal), Eiweiss (g), Fett (g) und Kohlenhydrate (g).
+  - Über den Button **„Anpassen“** bzw. **„Nährwerte berechnen“** können fehlende Nährwerte per KI kalkuliert oder korrigiert werden.
+- **Zutatenliste:** Mit interaktiven Checkboxen zum Abhaken während des Kochens.
+- **Dynamischer Portionsrechner:** Mit `+` und `-` Portionen ändern – alle Mengenangaben rechnen sich in Echtzeit mathematisch exakt um!
+- **Zubereitungsschritte:** Gut lesbare Nummerierung der Einzelschritte.
+- **Druckansicht & PDF-Export (🖨️):** Druckoptimierte Seite ohne störende Menüleisten.
 
 ---
 
-## 5. Die 4 Wege für neue Rezepte
+## 5. Die Wege für neue Rezepte
 
 Rezeptschatz bietet vier flexible Möglichkeiten, um neue Gerichte in Ihre Sammlung aufzunehmen:
 
@@ -129,133 +131,158 @@ Rezeptschatz bietet vier flexible Möglichkeiten, um neue Gerichte in Ihre Samml
 ### Weg 1: Rezept manuell erfassen
 *Für eigene Familienrezepte und freie Kreationen.*
 
-1. Wählen Sie im Menü **Rezepte > ➔ Neues Rezept erfassen** (oder Button `+ Neues Rezept`).
-2. Füllen Sie die Grunddaten aus:
-   - **Titel & Beschreibung**
-   - **Portionen & Zeiten** (Vorbereitungs-, Koch- und Ruhezeit)
-   - **Nährwerte** (Kalorien in kcal, Kohlenhydrate, Fett, Eiweiss in Gramm)
-3. **Rezeptbild:** Foto hochladen (vom Tablet oder PC).
-4. **Zutaten erfassen:**
-   - Zeilenweise Menge, Einheit (g, ml, EL, TL, Stk, etc.) und Zutatenname eingeben.
-   - Beliebig viele Zeilen mit `+ Zutat hinzufügen` ergänzen.
-   - Reihenfolge per Pfeilsymbolen anpassen.
-5. **Zubereitungsschritte:**
-   - Text eingeben und mit `+ Weiterer Schritt` gliedern.
-6. **Kategorien:** Setzen Sie Häkchen bei passenden Kategorien.
+1. Wählen Sie im Menü **Rezepte > ➔ Rezept erstellen** (`/recipes/create`).
+2. Füllen Sie die Grunddaten aus (Titel, Beschreibung, Portionen, Zeiten).
+3. **Rezeptbild:** Foto hochladen (vom Tablet, Smartphone oder PC).
+4. **Zutaten erfassen:** Zeilenweise Menge, Einheit und Zutat eingeben.
+5. **Zubereitungsschritte:** Text eingeben und beliebig viele Schritte hinzufügen.
+6. **Kategorien & Schlagwörter:** Häkchen bei passenden Kategorien setzen.
 7. Auf **„Rezept speichern“** tippen.
 
 ---
 
 ### Weg 2: Neues Rezept suchen / Im Rezeptschatz & Web suchen
-*Die universelle Rezeptsuche nach dem bewährten COOKmate-Muster (`/recipes/search`).*
+*Die universelle Rezeptsuche nach dem bewährten COOKmate-Muster (`/recipes/search` & `/recipes/import-web`).*
 
-Die Suchmaske bietet das vertraute Design mit dem grünen Weltkugel-Symbol, praktischen Dropdown-Filtern mit grünem Akzentrand und dem lachsfarbenen **„Suchen“**-Button:
+Rezeptschatz unterstützt das universelle **Schema.org (JSON-LD)** Format und funktioniert mit hunderten Kochportalen weltweit, darunter:
+- **Schweiz:** Betty Bossi, Swissmilk, Migusto, Fooby, GuteKüche.ch
+- **Deutschland / International:** Chefkoch.de, **Leckerschmecker.de**, Lecker.de, Essen & Trinken
 
-1. **Option A – Stichwortsuche (z. B. „Zürcher Geschnetzeltes“, „Kürbissuppe“):**
-   - Geben Sie den Suchbegriff in das Feld **„Suche oder URL-Eingabe“** ein.
-   - Wählen Sie die **Sprache** (Deutsch, Französisch, Italienisch, Englisch) und die gewünschte **Seite**:
-     - **Eigener Rezeptschatz:** Durchsucht Ihre persönliche Sammlung blitzschnell nach Titeln, Zutaten und Notizen.
-     - **Alle kompatiblen Webseiten / Chefkoch.de:** Durchsucht das Web und listet passende Rezepte als Karten mit Foto, Zubereitungszeit, Schwierigkeitsgrad und Bewertung auf.
-     - **Schweizer Kochportale (Betty Bossi, Swissmilk, Migusto, Fooby, GuteKüche.ch):** Bietet einen 1-Klick-Direktlink zur Rezeptsuche des jeweiligen Portals.
-   - Tippen Sie auf **„Suchen“**.
-   - Bei Web-Treffern genügt ein Klick auf **„📥 In Rezeptschatz importieren“**: Das Rezept wird mit Bild, Zutaten, Zubereitungsschritten und Nährwerten geladen und in der Vorschau angezeigt.
-   - Mit einem Klick auf **„In Rezeptschatz speichern“** ist es dauerhaft in Ihrer Sammlung gesichert!
+1. **Option A – Stichwortsuche:**
+   - Suchbegriff eingeben (z. B. *„Tomaten-Clafoutis“*, *„Couscous-Pfanne“*).
+   - Trefferliste durchsehen und bei einem Rezept auf **„📥 In Rezeptschatz importieren“** tippen.
+   - Bild, Zutaten, Schritte und Nährwerte werden automatisch übernommen.
 
 2. **Option B – Direkte Internet-Adresse (URL):**
-   - Kopieren Sie den Link eines beliebigen Rezepts aus dem Browser (z. B. von Betty Bossi, Swissmilk, Chefkoch, GuteKüche, etc.).
-   - Fügen Sie ihn in das Feld **„Suche oder URL-Eingabe“** ein und klicken Sie auf **„Suchen“**.
-   - Rezeptschatz liest automatisch die strukturierten Daten (`Schema.org / JSON-LD`) aus und zeigt Ihnen die vollständige Vorschau mit Nährwerten und Zutaten.
-   - Klicken Sie auf **„In Rezeptschatz speichern“** oder passen Sie das Rezept vor dem Speichern noch an.
+   - Kopieren Sie einen beliebigen Rezept-Link aus dem Browser (z. B. von Leckerschmecker oder Betty Bossi).
+   - Fügen Sie ihn in das URL-Feld ein und klicken Sie auf **„Rezept analysieren“**.
+   - Die Daten werden sekundenschnell strukturiert ausgelesen.
+   - Klicken Sie auf **„In Rezeptschatz speichern“** – fertig!
 
 ---
 
 ### Weg 3: 📷 Kochbuch-Scan (OCR)
-*Für Rezepte aus gedruckten Büchern, Magazinen oder handgeschriebenen Zetteln.*
+*Für Rezepte aus gedruckten Büchern, Zeitschriften oder handschriftlichen Notizen.*
 
-1. Wählen Sie im Menü **Mehr > ➔ 📷 Rezept scannen** (`/recipes/scan`).
-2. Tippen Sie auf **„Foto aufnehmen / Bild wählen“**:
-   - Auf dem Tablet öffnet sich direkt Ihre Gerätekamera.
-   - Fotografieren Sie die Rezeptseite gut ausgeleuchtet von oben ab.
-3. Die integrierte Texterkennung (**Tesseract OCR**) liest den Text lokal ein.
-4. Rezeptschatz analysiert die Absätze mit einem intelligenten Textparser:
-   - Der Titel wird extrahiert.
-   - Zutatenmengen (z. B. *„250 g Mehl“*, *„2 Eier“*) werden erkannt und in Mengen/Einheiten getrennt.
-   - Die Zubereitungsschritte werden in Einzelschritte aufgeteilt.
-5. Sie können den erkannten Text in der Vorschau prüfen und Tippfehler sofort korrigieren.
-6. Tippen Sie auf **„Rezept speichern“** – fertig!
+1. Wählen Sie im Menü **Rezepte > ➔ Scann ein Rezept** (`/recipes/scan`).
+2. Fotografieren Sie die Rezeptseite gut ausgeleuchtet ab.
+3. Die integrierte Texterkennung (**Tesseract OCR**) liest den Text ein.
+4. Titel, Zutatenmengen und Zubereitungsschritte werden automatisch getrennt und strukturiert.
+5. In der Vorschau kurz prüfen und auf **„Rezept speichern“** tippen.
 
 ---
 
 ### Weg 4: 🤖 Mit KI & Kühlschrank kochen (Foto-Scan)
-*Wenn Sie vor dem geöffneten Kühlschrank stehen und Inspiration aus Ihren Resten brauchen.*
+*Wenn Sie vor dem geöffneten Kühlschrank stehen und Inspiration aus Resten brauchen.*
 
-1. Wählen Sie im Menü **Mehr > ➔ 🤖 Mit KI & Kühlschrank kochen** (`/recipes/chatgpt`).
-2. **Kühlschrank fotografieren:**
-   - Tippen Sie auf das Kamerasymbol und fotografieren Sie das Innere Ihres Kühlschranks oder Vorratsschranks.
-3. **Kriterien nach Wunsch wählen:**
-   - **Maximale Zeit:** z. B. 15, 30 oder 45 Minuten.
-   - **Portionen:** z. B. 2 oder 4 Personen.
-   - **Ernährungsweise:** Normal, Vegetarisch, Vegan, Low-Carb oder Schnell & einfach.
-   - **Zusatzwünsche (optional):** z. B. *„Gerne mit Pasta“*, *„Keine Zwiebeln“*, *„Nicht zu scharf“*.
-4. Tippen Sie auf den grünen Zauber-Button:  
-   👉 **„✨ Rezept aus Kühlschrankfoto zaubern“**.
-5. **Was die KI macht:**
-   - **Google Gemini** analysiert Ihr Foto im Hintergrund in Sekundenschnelle.
-   - Alle sichtbaren Lebensmittel werden erkannt und oben als grüne Zutaten-Chips gelistet (z. B. *Hackfleisch, Karotten, Käse, Eier, Rahm*).
-   - Ein schmackhaftes Schweizer Alltagsrezept wird komponiert.
-   - **Realistische Nährwerte pro Portion** (Kalorien, Kohlenhydrate, Fett, Eiweiss) werden automatisch berechnet.
-6. **Rezept übernehmen:**
-   - Tippen Sie auf **„Rezept in Rezeptschatz speichern“**: Das Gericht wird mitsamt Ihrem Kühlschrankfoto, Nährwerten und automatischer Kategoriezuordnung in Ihrer Datenbank abgelegt.
-   - Alternativ tippen Sie auf **„Im Rezept-Editor bearbeiten“**, falls Sie vor dem Speichern noch eine Zutat anpassen möchten.
+1. Wählen Sie im Menü **Rezepte > ➔ Mit KI & Kühlschrank kochen** (`/recipes/chatgpt`).
+2. Fotografieren Sie das Innere Ihres Kühlschranks oder Vorratsschranks.
+3. Kriterien wählen (Zeitaufwand, Portionen, Ernährungsweise wie Normal, Vegetarisch, Low-Carb).
+4. Tippen Sie auf **„✨ Rezept aus Kühlschrankfoto zaubern“**.
+5. **Google Gemini** erkennt alle sichtbaren Zutaten, kreiert ein massgeschneidertes Rezept und berechnet automatisch realistische Nährwerte pro Portion.
+6. Mit einem Klick auf **„Rezept in Rezeptschatz speichern“** dauerhaft übernehmen.
 
 ---
 
-## 6. Einkaufsliste
+## 6. 🥑 Nährwerte ermitteln & Kategorien zuweisen (KI-Rechner)
+
+*Der intelligente Assistent zum automatischen Kalkulieren von Nährwerten und Ordnen von Rezepten (`/recipes/nutrition-calculator`).*
+
+Haben Sie Rezepte ohne Nährwerte oder möchten Sie ein Gericht auf Kalorien und Makronährstoffe analysieren? Mit dem Nährwert-Rechner erledigen Sie das in wenigen Sekunden:
+
+### Aufruf & Eingabe
+1. Wählen Sie im Menü **Rezepte > ➔ Nährwerte ermitteln** (oder klicken Sie in einer Rezeptansicht auf **„Nährwerte berechnen / Anpassen“**).
+2. Geben Sie die **Rezept-URL** ein (z. B. `https://rhz.internet-box.ch:8449/recipes/...`), eine UUID, oder wählen Sie einfach ein Rezept aus dem **Dropdown-Menü Ihrer Rezeptsammlung** aus.
+3. Auch **externe Rezept-Links** (z. B. von Chefkoch oder Leckerschmecker) können direkt eingegeben werden.
+
+### Automatische KI-Berechnung & Zutaten-Kategorien
+1. Klicken Sie auf **„Nährwerte berechnen“**.
+2. **Was im Hintergrund geschieht:**
+   - **Google Gemini** analysiert alle Zutaten und Mengenangaben des Rezepts.
+   - Präzise Nährwerte pro Portion werden berechnet:
+     - **Kalorien (Energie in kcal)**
+     - **Kohlenhydrate (in g)**
+     - **Fett (in g)**
+     - **Eiweiss / Protein (in g)**
+   - **Automatische Kategoriezuordnung:** Sofern die Checkbox aktiviert ist, weist das System dem Rezept im Hintergrund automatisch passende Hauptkategorien zu (z. B. *Fleisch, Geflügel, Fisch, Teigwaren, Reis, Gemüse, Käse* etc.).
+
+### Nährwerte überprüfen, anpassen & Commit
+- Das Ergebnis wird in übersichtlichen Eingabefeldern und einer Live-Gesamttabelle (pro Portion & Gesamtrezept) dargestellt.
+- **Freie Anpassung:** Sie können jeden Nährwertwert im Formular manuell überschreiben; die Gesamttabelle rechnet sich sofort in Echtzeit mit.
+- **Commit:** Klicken Sie auf **„In Datenbank speichern (Commit)“**:
+  - Die Nährwerte werden dauerhaft in der Datenbank beim Rezept gespeichert.
+  - Die Synchronisations-Version wird erhöht (sodass auch die Flutter-App die neuen Werte erhält).
+  - Sie werden sofort mit grünem Erfolgsbanner auf Ihre **Rezept-Hauptseite** weitergeleitet.
+- **Abbrechen:** Ein Klick auf **„Abbrechen“** verwirft die Berechnung und führt Sie direkt zurück zur Hauptseite.
+
+---
+
+## 7. Einkaufsliste
 
 Die Einkaufsliste (`/shopping-list`) hilft beim organisierten Einkauf:
 
-- **Zutaten übernehmen:** Aus jeder Rezeptansicht mit einem Klick auf *„Zur Einkaufsliste hinzufügen“*.
-- **Eigene Artikel hinzufügen:** Schnelleingabe oben für spontane Einkäufe (z. B. *„Milch“*, *„Butter“*, *„Mineralwasser“*).
+- **Zutaten übernehmen:** Aus jeder Rezeptansicht mit einem Klick auf *„Zur Einkaufsliste hinzufügen“* (in der gewünschten Portionsmenge!).
+- **Eigene Artikel hinzufügen:** Schnelleingabe für spontane Einkäufe (z. B. *„Milch“*, *„Mineralwasser“*).
 - **Abhaken im Laden:** Tippen Sie auf die Checkbox eines Artikels. Der Eintrag wird durchgestrichen und rückt nach unten.
-- **Bereinigen:** Ein Klick auf *„Erledigte entfernen“* löscht alle abgehakten Artikel mit einem Klick.
-- **Liste leeren:** Setzt die gesamte Liste zurück, sobald der Grosseinkauf abgeschlossen ist.
+- **Bereinigen:** *„Erledigte entfernen“* löscht alle abgehakten Artikel mit einem Klick.
+- **Liste leeren:** Setzt die gesamte Liste nach dem Grosseinkauf zurück.
 
 ---
 
-## 7. Menüplaner
+## 8. Menüplaner
 
 Der Menüplaner (`/meal-planner`) strukturiert Ihre Kochwoche von Montag bis Sonntag:
 
-- **Wochennavigation:** Mit den Pfeiltasten können Sie bequem zwischen der aktuellen, der nächsten oder vergangenen Kalenderwochen wechseln.
+- **Wochennavigation:** Bequem zwischen der aktuellen, nächsten oder vergangenen Kalenderwoche blättern.
 - **Gericht zuweisen:** Wählen Sie bei einem Wochentag einfach das gewünschte Rezept aus Ihrer Sammlung aus.
-- **Gesamteinkauf planen:** Über die Schaltfläche *„Zutaten der Woche auf Einkaufsliste“* landen alle benötigten Lebensmittel der geplanten Tage direkt auf Ihrer Einkaufsliste.
+- **Gesamteinkauf planen:** Über *„Zutaten der Woche auf Einkaufsliste“* landen alle benötigten Lebensmittel der gesamten Woche mit einem Klick auf Ihrer Einkaufsliste.
 
 ---
 
-## 8. Kategorien & Schlagwörter verwalten
+## 9. Kategorien & Schlagwörter verwalten
 
 ### Kategorien (`/categories`)
-Kategorien bringen eine klare Grundstruktur in Ihre Sammlung (nach Hauptzutaten & Gängen):
+Bringen eine klare Grundstruktur nach Hauptzutaten und Gängen:
 - **Hauptzutaten:** Fleisch, Geflügel, Fisch, Teigwaren, Reis, Kartoffel, Gemüse, Pilz, Käse.
 - **Mahlzeitenarten:** Suppe, Salat, Dessert, Backen.
-- **Individuelle Farben:** Jede Kategorie kann eine eigene Erkennungsfarbe tragen (z. B. saftiges Grün für Gemüse, warmes Gold für Teigwaren).
-- **Automatische Erkennung:** Anhand der Zutaten werden Rezepte beim Erstellen oder Scannen automatisch den passenden Kategorien zugewiesen.
+- **Individuelle Farben:** Jede Kategorie kann eine eigene Erkennungsfarbe tragen.
+- **Automatische Erkennung:** Anhand der Zutaten werden Rezepte automatisch den passenden Kategorien zugewiesen.
 
 ### Schlagwörter / Tags (`/tags`)
-Schlagwörter ergänzen die Kategorien um flexible Eigenschaften wie Anlässe, Zubereitungsarten oder Saisons:
+Ergänzen die Kategorien um Eigenschaften wie Anlässe, Zubereitungsarten oder Saisons:
 - **Beispiele:** `#Schnell (< 30 Min.)`, `#Gäste & Fest`, `#Einfach & Alltag`, `#Klassiker`, `#Sommer`, `#Winter & Deftig`, `#Low-Carb`, `#Vegetarisch`, `#Resteverwertung`, `#Apéro`, `#Backofen`, `#Schweizer Küche`.
-- **Eigene Schlagwörter anlegen:** In der Schlagwörter-Verwaltung (`Rezepte > ➔ Schlagwörter`) oder direkt beim Erfassen eines Rezepts durch Eintippen und Enter-Drücken.
-- **Schnellfilter in der Rezeptliste:** In der Rezeptübersicht finden Sie alle Schlagwörter als praktische Filter-Chips. Ein Fingertipp genügt, um z. B. nur alle Rezepte für *„Gäste & Fest“* oder *„Schnell“* anzuzeigen.
-- **Verlinkung im Rezept:** In jeder Rezeptansicht sind die Schlagwörter klickbar und führen direkt zur gefilterten Liste.
+- **Eigene Schlagwörter anlegen:** In der Tag-Verwaltung (`Rezepte > ➔ Schlagwörter`) oder direkt im Rezept-Editor.
+- **Filter-Chips:** In der Rezeptübersicht genügt ein Tipp auf einen Tag-Chip, um z. B. alle `#Schnell`-Gerichte zu filtern.
 
 ---
 
-## 9. Administration & Server-Befehle (Raspberry Pi)
+## 10. 📱 Mobile Flutter-App: Synchronisation & Offline-Nutzung
 
-Für Wartungsarbeiten auf Ihrem Raspberry Pi (`pironman`) stehen Ihnen folgende nützliche Konsolenbefehle zur Verfügung:
+Neben der Web-Applikation steht die native mobile **Rezeptschatz Flutter-App** für Android und iOS bereit.
+
+### Neues hellblaues App-Icon
+- Die App präsentiert sich mit einem modernen, randlosen App-Icon (goldenes Rezeptbuch in einer Holz-Schatztruhe auf harmonischem hellblauem Hintergrund).
+- Unterstützt moderne **Android Adaptive Icons** (z. B. auf Samsung One UI), sodass das Symbol randlos und ohne störenden weissen Rahmen dargestellt wird.
+
+### Rezepte aus der Datenbank aktualisieren (Sync)
+Haben Sie auf dem PC oder Tablet neue Rezepte hinzugefügt oder Nährwerte berechnet?
+1. Öffnen Sie die Rezeptschatz-App auf Ihrem Smartphone.
+2. Tippen Sie oben in der Navigationsleiste auf das **Cloud-Download- / Sync-Symbol** (🔄).
+3. Bestätigen Sie im Dialog **„Rezepte synchronisieren“**.
+4. Die App gleicht alle neuen und bearbeiteten Rezepte, Bilder, Nährwerte und Kategorien blitzschnell mit der MariaDB-Datenbank auf Ihrem Raspberry Pi ab.
+
+### Offline-Fähigkeit in der Küche
+- Einmal synchronisiert, sind alle Rezepte, Zutaten und Zubereitungsschritte lokal auf dem Smartphone gespeichert.
+- Sie können auch im Keller, im Supermarkt ohne Empfang oder in der Ferienwohnung offline auf Ihre gesamte Rezeptsammlung zugreifen.
+
+---
+
+## 11. Administration & Server-Befehle (Raspberry Pi)
+
+Für Wartungsarbeiten auf Ihrem Raspberry Pi (`pironman:/var/www/rezeptschatz`) stehen Ihnen folgende Konsolenbefehle zur Verfügung:
 
 ### Software-Aktualisierung (Git Pull)
-Um die neuesten Funktionen und Anpassungen auf den Server zu laden:
+Um die neuesten Funktionen und Fehlerbehebungen auf den Server zu laden:
 ```bash
 cd /var/www/rezeptschatz
 sudo git reset --hard origin/main
@@ -264,29 +291,39 @@ php artisan optimize:clear
 sudo systemctl restart php*-fpm
 ```
 
+### Neuer Nährwert-Konsolenbefehl (`get:nutritional-val`)
+Ermittelt, berechnet und speichert Nährwerte für jedes Rezept direkt im Terminal:
+```bash
+# Nährwerte anhand einer URL oder ID analysieren und als formatierte Tabelle anzeigen:
+php artisan get:nutritional-val "https://rhz.internet-box.ch:8449/recipes/b7d9e63b-06dd-4855-a981-b8f150220482"
+
+# Nährwerte berechnen und direkt in der Datenbank beim Rezept speichern:
+php artisan get:nutritional-val "https://rhz.internet-box.ch:8449/recipes/b7d9e63b-06dd-4855-a981-b8f150220482" --save
+
+# Neuberechnung für ein Rezept nach Titel erzwingen:
+php artisan recipe:nutritional-val "Tomaten-Clafoutis" --recalculate --save
+```
+
+### Automatische Kategorienerkennung über alle Rezepte laufen lassen
+Analysiert alle Zutaten in der Datenbank und ordnet Fleisch, Geflügel, Gemüse, Teigwaren etc. zu:
+```bash
+php artisan recipes:assign-ingredient-categories
+```
+
+### Dateirechte & Berechtigungen (`www-data`)
+Sollte das Speichern im Webbrowser hängen bleiben, fehlen dem Webserver oft Schreibrechte auf die Cache- und Logverzeichnisse. Führen Sie in diesem Fall einmal Folgendes aus:
+```bash
+sudo chown -R www-data:www-data /var/www/rezeptschatz/storage /var/www/rezeptschatz/bootstrap/cache
+sudo chmod -R 775 /var/www/rezeptschatz/storage /var/www/rezeptschatz/bootstrap/cache
+```
+
 ### KI-Verbindung und Modelle testen
 Prüft die Erreichbarkeit von Google Gemini und zeigt alle freigeschalteten Modelle:
 ```bash
 php artisan ai:test
 ```
 
-### Nährwerte nachträglich eintragen / anpassen
-Setzt oder korrigiert die Nährwerte eines bestehenden Rezepts über die Konsole:
-```bash
-# Automatisches Setzen für die Hackfleisch-Pfanne:
-php artisan recipe:set-nutrition
-
-# Beliebiges anderes Rezept gezielt anpassen:
-php artisan recipe:set-nutrition "Risotto" --calories=480 --carbs=65 --fat=14 --protein=11
-```
-
-### Automatische Kategorienerkennung über alle Rezepte laufen lassen
-Verknüpft alle bestehenden Rezepte anhand ihrer Zutaten mit den richtigen Hauptkategorien:
-```bash
-php artisan recipes:assign-ingredient-categories
-```
-
-### Caches leeren (bei Layout- oder Konfigurationsänderungen)
+### Caches leeren & Wartung
 ```bash
 php artisan optimize:clear
 ```
@@ -295,9 +332,10 @@ php artisan optimize:clear
 
 ## Zusammenfassung & Tipps für die Küche
 
-1. **Tablet-Halterung:** Stellen Sie Ihr Tablet mit einer abwischbaren Hülle in die Küche. Im PWA-Vollbildmodus bleibt der Bildschirm übersichtlich und Sie können Zutaten mit nassen Fingern mühelos abhaken.
-2. **Kühlschrank-Scan:** Achten Sie beim Fotografieren des Kühlschranks darauf, dass das Innenlicht gut leuchtet und auch die Gemüseschublade oder die Seitentür leicht sichtbar sind – so erkennt Google Gemini noch mehr passende Zutaten.
-3. **Portionen umrechnen:** Vor dem Kochen kurz auf `+` oder `-` tippen, um Fleisch- und Flüssigkeitsmengen exakt an die Gästezahl anzupassen.
+1. **Tablet-Halterung:** Stellen Sie Ihr Tablet mit einer abwischbaren Hülle in die Küche. Im Vollbildmodus bleibt der Bildschirm an und Sie können Zutaten mit nassen Fingern mühelos abhaken.
+2. **Nährwert-Ampel im Blick:** Berechnen Sie bei neuen Rezepten kurz die Nährwerte über den neuen Nährwert-Rechner – so sehen Sie auf einen Blick, wie proteinreich oder kalorienarm das Gericht ist.
+3. **Kühlschrank-Scan:** Achten Sie beim Fotografieren des Kühlschranks darauf, dass das Innenlicht gut leuchtet – so erkennt Google Gemini noch mehr passende Zutaten für spontane Menüs.
+4. **Portionen umrechnen:** Vor dem Kochen kurz auf `+` oder `-` tippen, um Fleisch- und Flüssigkeitsmengen exakt an die Gästezahl anzupassen.
+5. **Mobile Synchronisation:** Vor dem Einkaufen kurz in der Smartphone-App auf den Sync-Button tippen, damit alle neuen Rezepte und Zutaten für den Einkauf offline parat sind.
 
 *Viel Freude beim Kochen und Geniessen mit Ihrem persönlichen Rezeptschatz!* 🍳🥗🥖
-

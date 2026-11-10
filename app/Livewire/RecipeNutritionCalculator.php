@@ -245,13 +245,6 @@ class RecipeNutritionCalculator extends Component
      */
     public function saveNutrition()
     {
-        Log::info('Nährwert-Rechner: saveNutrition aufgerufen', [
-            'has_data' => (bool) $this->recipeData,
-            'type' => $this->recipeData['type'] ?? null,
-            'id' => $this->recipeData['id'] ?? null,
-            'calories' => $this->calories,
-        ]);
-
         if (!$this->recipeData) {
             $this->errorMessage = 'Es sind keine Rezeptdaten vorhanden. Bitte zuerst die Nährwerte berechnen.';
             return;
@@ -338,7 +331,6 @@ class RecipeNutritionCalculator extends Component
                 return redirect()->route('recipes.index');
             }
         } catch (\Throwable $e) {
-            Log::error('Nährwert-Rechner: Speichern fehlgeschlagen: ' . $e->getMessage());
             $this->errorMessage = 'Fehler beim Speichern in die Datenbank: ' . $e->getMessage();
         } finally {
             $this->isSaving = false;
