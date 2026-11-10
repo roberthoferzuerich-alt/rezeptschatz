@@ -180,7 +180,22 @@
                                     Kohlenhydrate: <strong class="text-stone-900">{{ $recipe->carbohydrates }} g</strong>
                                 </div>
                             @endif
+                            <a href="{{ route('recipes.nutrition', ['recipe' => $recipe->id]) }}" class="text-[#8ea92c] hover:underline flex items-center space-x-1 font-semibold ml-2" title="Nährwerte neu berechnen oder manuell anpassen">
+                                <span class="material-symbols-outlined text-sm">edit</span>
+                                <span>Anpassen</span>
+                            </a>
                         </div>
+                    </div>
+                @else
+                    <div class="mt-4 p-3 rounded-xl bg-stone-50 border border-stone-200 flex items-center justify-between text-xs text-stone-600">
+                        <span class="flex items-center space-x-1.5">
+                            <span class="material-symbols-outlined text-[#8ea92c] text-sm">nutrition</span>
+                            <span>Keine Nährwerte hinterlegt.</span>
+                        </span>
+                        <a href="{{ route('recipes.nutrition', ['recipe' => $recipe->id]) }}" class="inline-flex items-center space-x-1 text-[#8ea92c] hover:text-[#7c9526] font-semibold">
+                            <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                            <span>Nährwerte berechnen</span>
+                        </a>
                     </div>
                 @endif
 

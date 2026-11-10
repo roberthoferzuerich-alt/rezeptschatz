@@ -17,7 +17,8 @@ class AssignIngredientCategoriesCommand extends Command
     protected $signature = 'recipes:assign-ingredient-categories 
                             {--category= : Nur eine bestimmte Zutat/Kategorie zuweisen (z.B. Fleisch, Geflügel, Fisch, Teigwaren)} 
                             {--dry-run : Zeigt nur eine Vorschau, ohne Änderungen in die Datenbank zu schreiben} 
-                            {--user= : E-Mail oder ID des Benutzers}';
+                            {--user= : E-Mail oder ID des Benutzers}
+                            {--recipe= : ID oder UUID eines einzelnen Rezepts}';
 
     /**
      * The console command description.
@@ -198,10 +199,16 @@ class AssignIngredientCategoriesCommand extends Command
             $this->comment("DRY-RUN AKTIV: Es werden keine Änderungen in die Datenbank geschrieben.\n");
         }
 
-        // Alle Rezepte des Benutzers mit Kategorien und Zutaten laden
-        $recipes = Recipe::with(['ingredients', 'categories'])
-            ->where('user_id', $user->id)
-            ->get();
+        // Rezepte des Benutzers laden (optional gefiltert nach Einzelrezept)
+        $recipeId = $this->option('recipe');
+        $recipesQuery = Recipe::with(['ingredients', 'categories'])
+            ->where('user_id', $user->id);
+
+        if ($recipeId) {
+            $recipesQuery->where('id', $recipeId);
+        }
+
+        $recipes = $recipesQuery->get();
 
         $tableRows = [];
         $totalNewlyAssigned = 0;

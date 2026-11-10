@@ -11,6 +11,7 @@ use App\Livewire\RecipeDetail;
 use App\Livewire\RecipeForm;
 use App\Livewire\RecipeImport;
 use App\Livewire\RecipeList;
+use App\Livewire\RecipeNutritionCalculator;
 use App\Livewire\RecipeScanner;
 use App\Livewire\RecipeSearch;
 use App\Livewire\ShoppingList;
@@ -40,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/recipes/scan', RecipeScanner::class)->name('recipes.scan');
     Route::get('/recipes/import', RecipeImport::class)->name('recipes.import');
     Route::get('/recipes/import-web', WebRecipeImport::class)->name('recipes.import.web');
+    Route::get('/recipes/nutrition-calculator', RecipeNutritionCalculator::class)->name('recipes.nutrition');
     Route::get('/recipes/chatgpt', ChatGptCooking::class)->name('recipes.chatgpt');
     Route::get('/recipes/{id}/edit', RecipeForm::class)->name('recipes.edit');
     Route::get('/recipes/{id}/print', [RecipePrintController::class, 'show'])->name('recipes.print');
