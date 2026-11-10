@@ -23,10 +23,16 @@ class AddFamilyUsersCommand extends Command
     {
         $password = $this->option('password') ?: 'password';
 
+        // Ggf. alten Tippfehler bereinigen, falls bereits angelegt
+        $oldAnnemarie = User::where('email', 'annemarie.hofer@bluewin.ch')->first();
+        if ($oldAnnemarie) {
+            $oldAnnemarie->update(['email' => 'annemariehofer@bluewin.ch']);
+        }
+
         $users = [
             [
                 'name' => 'Annemarie Hofer',
-                'email' => 'annemarie.hofer@bluewin.ch',
+                'email' => 'annemariehofer@bluewin.ch',
                 'role' => 'member',
             ],
             [

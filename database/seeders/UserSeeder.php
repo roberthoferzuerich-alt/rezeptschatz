@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
         );
 
         User::updateOrCreate(
-            ['email' => 'annemarie.hofer@bluewin.ch'],
+            ['email' => 'annemariehofer@bluewin.ch'],
             [
                 'name' => 'Annemarie Hofer',
                 'role' => 'member',

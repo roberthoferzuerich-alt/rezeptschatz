@@ -47,6 +47,10 @@
             <span>Nährwerte ermitteln</span>
             <span class="text-[10px] uppercase font-bold bg-[#8ea92c]/15 text-[#8ea92c] px-1.5 py-0.5 rounded">KI</span>
         </a>
+        <a href="{{ route('manual') }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
+            <span>Benutzeranleitung</span>
+            <span class="material-symbols-outlined text-base text-[#8ea92c]">menu_book</span>
+        </a>
 
         <hr class="my-1.5 border-stone-100">
 
@@ -136,6 +140,14 @@
         </a>
         <a href="{{ route('account.index', ['tab' => 'help']) }}" class="block px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] transition">
             Hilfe und Support
+        </a>
+        <hr class="my-1 border-stone-100">
+        <a href="{{ route('manual') }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] font-semibold text-stone-800 transition">
+            <span class="flex items-center space-x-2">
+                <span class="material-symbols-outlined text-base text-[#8ea92c]">menu_book</span>
+                <span>Benutzeranleitung</span>
+            </span>
+            <span class="text-[10px] uppercase font-bold bg-[#8ea92c]/15 text-[#8ea92c] px-1.5 py-0.5 rounded">Handbuch</span>
         </a>
     </div>
 </div>

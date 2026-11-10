@@ -151,7 +151,7 @@
                                        @click="open = false"
                                        class="flex items-center space-x-2.5 hover:underline transition">
                                         <span class="text-base leading-none">•</span>
-                                        <span>COOKmate-Einstellungen</span>
+                                        <span>Rezeptschatz-Einstellungen</span>
                                     </a>
                                 </li>
                                 <li>

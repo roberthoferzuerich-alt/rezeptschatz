@@ -416,6 +416,20 @@
                         <h3 class="text-lg font-bold text-stone-900">Hilfe und Support</h3>
                         <p class="text-sm text-stone-500">Tipps zur Bedienung und Synchronisation.</p>
                     </div>
+
+                    <div class="p-5 rounded-xl bg-emerald-50/70 border border-emerald-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-emerald-950 flex items-center space-x-1.5">
+                                <span class="material-symbols-outlined text-base text-[#8ea92c]">menu_book</span>
+                                <span>Vollständiges Benutzerhandbuch</span>
+                            </h4>
+                            <p class="text-xs text-emerald-800">Umfassende Anleitung für alle Funktionen (Web, PWA, Raspberry Pi, KI-Nährwertrechner, Flutter-App & Sync).</p>
+                        </div>
+                        <a href="{{ route('manual') }}" class="inline-flex items-center space-x-1.5 px-4 py-2 bg-[#8ea92c] hover:bg-[#7c9526] text-white text-xs font-bold rounded-lg shadow-xs transition shrink-0">
+                            <span>Handbuch öffnen</span>
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </a>
+                    </div>
                     <div class="space-y-4 text-sm text-stone-700">
                         <div class="p-4 rounded-lg bg-stone-50 border border-stone-200">
                             <h4 class="font-bold text-stone-900 mb-1">Rezepte erfassen & bearbeiten</h4>

@@ -16,6 +16,7 @@ use App\Livewire\RecipeScanner;
 use App\Livewire\RecipeSearch;
 use App\Livewire\ShoppingList;
 use App\Livewire\TagManager;
+use App\Livewire\UserManual;
 use App\Livewire\WebRecipeImport;
 use Illuminate\Support\Facades\Route;
 
@@ -62,4 +63,7 @@ Route::middleware('auth')->group(function () {
 
     // Benutzerkonto & Einstellungen ("Dein Konto")
     Route::get('/account', AccountSettings::class)->name('account.index');
+
+    // Benutzeranleitung & Handbuch
+    Route::get('/manual', UserManual::class)->name('manual');
 });
