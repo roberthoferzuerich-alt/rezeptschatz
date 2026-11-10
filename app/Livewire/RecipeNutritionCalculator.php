@@ -7,6 +7,7 @@ use App\Services\AiRecipeService;
 use App\Services\WebRecipeImportService;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -49,7 +50,7 @@ class RecipeNutritionCalculator extends Component
     public ?string $successMessage = null;
 
     /**
-     * Die ermittelten Rezeptdaten
+     * Die ermittelten Rezeptdaten (nur skalare Werte / Arrays)
      */
     public ?array $recipeData = null;
 
@@ -90,7 +91,7 @@ class RecipeNutritionCalculator extends Component
     /**
      * Generiert die Nährwerte anhand der URL oder ID
      */
-    public function generate(AiRecipeService $aiService, WebRecipeImportService $importService): void
+    public function generate(): void
     {
         $this->errorMessage = null;
         $this->successMessage = null;
@@ -108,6 +109,9 @@ class RecipeNutritionCalculator extends Component
         }
 
         try {
+            $aiService = app(AiRecipeService::class);
+            $importService = app(WebRecipeImportService::class);
+
             // 1. UUID ermitteln
             $uuid = null;
             if (preg_match('/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/', $target, $m)) {
@@ -149,7 +153,6 @@ class RecipeNutritionCalculator extends Component
                     'portions' => $portions,
                     'ingredients' => $ingredientsList,
                     'source' => $calc['source'] ?? 'Berechnet via KI',
-                    'original_recipe' => $recipe,
                 ];
 
                 $this->calories = (int) ($calc['calories'] ?? 0);
@@ -158,12 +161,16 @@ class RecipeNutritionCalculator extends Component
                 $this->protein = (float) ($calc['protein'] ?? 0);
                 $this->portions = $portions;
 
-                // Automatische Hauptzutaten-Kategorien direkt im Hintergrund zuweisen falls gewünscht
+                // Automatische Hauptzutaten-Kategorien im Hintergrund zuweisen
                 if ($this->autoAssignCategories) {
-                    Artisan::call('recipes:assign-ingredient-categories', [
-                        '--user' => Auth::id(),
-                        '--recipe' => $recipe->id,
-                    ]);
+                    try {
+                        Artisan::call('recipes:assign-ingredient-categories', [
+                            '--user' => Auth::id(),
+                            '--recipe' => $recipe->id,
+                        ]);
+                    } catch (\Throwable $e) {
+                        Log::warning('Kategorie-Zuweisung bei generate fehlgeschlagen: ' . $e->getMessage());
+                    }
                 }
             } 
             // Fall B: Externe Rezept-URL (Webseite)
@@ -200,15 +207,22 @@ class RecipeNutritionCalculator extends Component
                     return trim("{$amount} " . ($ing['name'] ?? ''));
                 }, $ingredients);
 
+                // Speichere nur saubere skalare Daten (keine Objekte/DOM-Elemente)
                 $this->recipeData = [
                     'type' => 'external',
                     'id' => null,
-                    'title' => $parsed['title'] ?? 'Externes Rezept',
+                    'title' => (string) ($parsed['title'] ?? 'Externes Rezept'),
                     'image_url' => $parsed['image_url'] ?? null,
                     'portions' => $portions,
                     'ingredients' => $ingredientStrings,
                     'source' => $sourceStr,
-                    'parsed_external' => $parsed,
+                    'external_title' => (string) ($parsed['title'] ?? 'Externes Rezept'),
+                    'external_description' => (string) ($parsed['description'] ?? ''),
+                    'external_source_url' => $target,
+                    'external_ingredients' => $ingredients,
+                    'external_steps' => $parsed['steps'] ?? [],
+                    'external_prep_time' => $parsed['prep_time_minutes'] ?? null,
+                    'external_cook_time' => $parsed['cook_time_minutes'] ?? null,
                 ];
 
                 $this->calories = $calVal;
@@ -229,7 +243,7 @@ class RecipeNutritionCalculator extends Component
     /**
      * Speichern (Commit): Schreibt die Nährwerte direkt in die Datenbank
      */
-    public function commit(WebRecipeImportService $importService): void
+    public function commit()
     {
         if (!$this->recipeData) {
             return;
@@ -239,6 +253,8 @@ class RecipeNutritionCalculator extends Component
         $this->errorMessage = null;
 
         try {
+            $importService = app(WebRecipeImportService::class);
+
             $cal = max(0, (int) $this->calories);
             $carb = max(0.0, (float) $this->carbohydrates);
             $f = max(0.0, (float) $this->fat);
@@ -262,41 +278,56 @@ class RecipeNutritionCalculator extends Component
                 $recipe->server_version = ((int) $recipe->server_version) + 1;
                 $recipe->save();
 
-                // Artisan Kategoriezuweisung ausführen
+                // Artisan Kategoriezuweisung ausführen (mit sicherem try/catch)
                 if ($this->autoAssignCategories) {
-                    Artisan::call('recipes:assign-ingredient-categories', [
-                        '--user' => Auth::id(),
-                        '--recipe' => $recipe->id,
-                    ]);
+                    try {
+                        Artisan::call('recipes:assign-ingredient-categories', [
+                            '--user' => Auth::id(),
+                            '--recipe' => $recipe->id,
+                        ]);
+                    } catch (\Throwable $catErr) {
+                        Log::warning('Kategorie-Zuweisung bei commit fehlgeschlagen: ' . $catErr->getMessage());
+                    }
                 }
 
-                $this->successMessage = "Nährwerte für „{$recipe->title}“ wurden erfolgreich in der Datenbank gespeichert!";
-                $this->recipeData['saved_recipe_id'] = $recipe->id;
+                session()->flash('success', "Nährwerte für „{$recipe->title}“ wurden erfolgreich in der Datenbank gespeichert!");
+                return $this->redirectRoute('recipes.show', $recipe->id, navigate: true);
             } elseif ($this->recipeData['type'] === 'external') {
                 // Bei externen Rezepten wird das Rezept importiert und mit den Nährwerten gespeichert
-                $parsed = $this->recipeData['parsed_external'] ?? [];
-                $parsed['portions'] = $port;
-                $parsed['nutrition'] = [
-                    'calories' => $cal,
-                    'carbohydrates' => $carb,
-                    'fat' => $f,
-                    'protein' => $prot,
-                    'raw' => $nutritionRaw,
+                $parsed = [
+                    'title' => $this->recipeData['external_title'] ?? 'Externes Rezept',
+                    'description' => $this->recipeData['external_description'] ?? '',
+                    'source_url' => $this->recipeData['external_source_url'] ?? '',
+                    'portions' => $port,
+                    'prep_time_minutes' => $this->recipeData['external_prep_time'] ?? null,
+                    'cook_time_minutes' => $this->recipeData['external_cook_time'] ?? null,
+                    'ingredients' => $this->recipeData['external_ingredients'] ?? [],
+                    'steps' => $this->recipeData['external_steps'] ?? [],
+                    'image_url' => $this->recipeData['image_url'] ?? null,
+                    'nutrition' => [
+                        'calories' => $cal,
+                        'carbohydrates' => $carb,
+                        'fat' => $f,
+                        'protein' => $prot,
+                        'raw' => $nutritionRaw,
+                    ],
                 ];
 
                 $recipe = $importService->saveToDatabase(Auth::user(), $parsed);
 
                 if ($this->autoAssignCategories) {
-                    Artisan::call('recipes:assign-ingredient-categories', [
-                        '--user' => Auth::id(),
-                        '--recipe' => $recipe->id,
-                    ]);
+                    try {
+                        Artisan::call('recipes:assign-ingredient-categories', [
+                            '--user' => Auth::id(),
+                            '--recipe' => $recipe->id,
+                        ]);
+                    } catch (\Throwable $catErr) {
+                        Log::warning('Kategorie-Zuweisung bei commit fehlgeschlagen: ' . $catErr->getMessage());
+                    }
                 }
 
-                $this->successMessage = "Rezept „{$recipe->title}“ wurde mit den Nährwerten erfolgreich in deiner Rezeptsammlung gespeichert!";
-                $this->recipeData['type'] = 'internal';
-                $this->recipeData['id'] = $recipe->id;
-                $this->recipeData['saved_recipe_id'] = $recipe->id;
+                session()->flash('success', "Rezept „{$recipe->title}“ wurde mit den Nährwerten erfolgreich gespeichert!");
+                return $this->redirectRoute('recipes.show', $recipe->id, navigate: true);
             }
         } catch (\Throwable $e) {
             $this->errorMessage = 'Fehler beim Speichern in die Datenbank: ' . $e->getMessage();
@@ -317,11 +348,13 @@ class RecipeNutritionCalculator extends Component
         $this->carbohydrates = null;
         $this->fat = null;
         $this->protein = null;
+        $this->isSaving = false;
+        $this->isGenerating = false;
     }
 
     public function render()
     {
-        // 20 aktuellste Rezepte des Benutzers für ein schnelles Auswahlfeld laden
+        // 25 aktuellste Rezepte des Benutzers für ein schnelles Auswahlfeld laden
         $userRecipes = Recipe::where('user_id', Auth::id())
             ->orderBy('title')
             ->get(['id', 'title']);

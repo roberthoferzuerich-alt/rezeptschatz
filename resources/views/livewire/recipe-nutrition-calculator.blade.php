@@ -269,6 +269,14 @@
                 </div>
             @endif
 
+            <!-- Fehlermeldung direkt beim Speichern anzeigen -->
+            @if ($errorMessage)
+                <div class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-center space-x-2">
+                    <span class="material-symbols-outlined text-red-600 text-base">error</span>
+                    <span>{{ $errorMessage }}</span>
+                </div>
+            @endif
+
             <!-- AKTIONEN: COMMIT & ABBRECHEN -->
             <div class="flex flex-col-reverse sm:flex-row items-center justify-between pt-4 border-t border-stone-200 gap-3">
                 <button type="button" 
