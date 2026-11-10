@@ -41,7 +41,7 @@ class RecipeNutritionCalculatorTest extends TestCase
             ->set('fat', 27.3)
             ->set('protein', 16)
             ->set('portions', 4)
-            ->call('commit')
+            ->call('saveNutrition')
             ->assertHasNoErrors()
             ->assertSet('errorMessage', null)
             ->assertRedirect(route('recipes.index'));
@@ -53,3 +53,4 @@ class RecipeNutritionCalculatorTest extends TestCase
         $this->assertEquals(16.0, (float) $recipe->protein);
     }
 }
+
