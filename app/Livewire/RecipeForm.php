@@ -30,6 +30,7 @@ class RecipeForm extends Component
     public string $notes = '';
     public string $source_url = '';
     public bool $is_favorite = false;
+    public bool $is_shared = true;
 
     // Nährwerte (pro Portion)
     public ?int $calories = null;
@@ -113,6 +114,7 @@ class RecipeForm extends Component
             $this->notes = $recipe->notes ?? '';
             $this->source_url = $recipe->source_url ?? '';
             $this->is_favorite = (bool) $recipe->is_favorite;
+            $this->is_shared = (bool) ($recipe->is_shared ?? true);
             $this->calories = $recipe->calories;
             $this->carbohydrates = $recipe->carbohydrates !== null ? (float) $recipe->carbohydrates : null;
             $this->fat = $recipe->fat !== null ? (float) $recipe->fat : null;
@@ -280,6 +282,7 @@ class RecipeForm extends Component
             'notes' => ['nullable', 'string'],
             'source_url' => ['nullable', 'url', 'max:1000'],
             'is_favorite' => ['boolean'],
+            'is_shared' => ['boolean'],
             'selectedCategoryIds' => ['array'],
             'ingredients.*.name' => ['nullable', 'string', 'max:255'],
             'ingredients.*.amount_numeric' => ['nullable', 'numeric', 'min:0'],
@@ -339,6 +342,7 @@ class RecipeForm extends Component
             'notes' => trim($this->notes),
             'source_url' => trim($this->source_url),
             'is_favorite' => $this->is_favorite,
+            'is_shared' => (bool) $this->is_shared,
             'category_ids' => $this->selectedCategoryIds,
             'tag_ids' => $this->selectedTagIds,
             'ingredients' => $cleanIngredients,

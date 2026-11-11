@@ -44,6 +44,18 @@ class RecipeDetail extends Component
         $recipeService->toggleFavorite($user, $recipe);
     }
 
+    public function toggleShared(): void
+    {
+        $user = Auth::user();
+        $recipe = Recipe::where('user_id', $user->id)->findOrFail($this->recipeId);
+        $recipe->is_shared = !$recipe->is_shared;
+        $recipe->server_version = ((int) $recipe->server_version) + 1;
+        $recipe->save();
+
+        $status = $recipe->is_shared ? 'freigegeben (in Gesamtansicht sichtbar)' : 'privat (nur für Sie sichtbar)';
+        session()->flash('success', "Freigabestatus geändert: Das Rezept ist jetzt {$status}.");
+    }
+
     public function copyRecipe(RecipeService $recipeService)
     {
         $user = Auth::user();

@@ -31,6 +31,19 @@
                     <span class="hidden sm:inline">Drucken</span>
                 </a>
 
+                @if ($isOwner)
+                    <!-- Freigabe Umschalter (Öffentlich vs. Privat) -->
+                    <button wire:click="toggleShared" 
+                            type="button"
+                            title="{{ $recipe->is_shared ? 'Rezept ist freigegeben. Klicken, um es privat zu schalten (verschwindet aus der Gesamtansicht)' : 'Rezept ist privat. Klicken, um es freizugeben (erscheint in der Gesamtansicht)' }}"
+                            class="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg border text-sm font-medium shadow-xs transition cursor-pointer {{ $recipe->is_shared ? 'border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100' : 'border-stone-300 text-stone-600 bg-stone-100 hover:bg-stone-200' }}">
+                        <span class="material-symbols-outlined text-base {{ $recipe->is_shared ? 'text-emerald-600' : 'text-stone-500' }}">
+                            {{ $recipe->is_shared ? 'share' : 'lock' }}
+                        </span>
+                        <span class="hidden sm:inline">{{ $recipe->is_shared ? 'Freigegeben' : 'Privat' }}</span>
+                    </button>
+                @endif
+
                 @if ($canEdit)
                     <a href="{{ route('recipes.edit', $recipe->id) }}" class="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-stone-300 text-stone-700 bg-white hover:bg-stone-50 text-sm font-medium shadow-xs transition">
                         <span class="material-symbols-outlined text-base">edit</span>

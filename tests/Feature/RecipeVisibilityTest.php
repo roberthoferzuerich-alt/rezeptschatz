@@ -58,5 +58,43 @@ class RecipeVisibilityTest extends TestCase
             ->assertSee('Mein privates Rezept')
             ->assertDontSee('Fremdes freigegebenes Rezept');
     }
+
+    public function test_owner_can_toggle_recipe_sharing_in_detail_view(): void
+    {
+        $user = User::factory()->create();
+        $recipe = $this->makeRecipe($user, 'Testgericht', false);
+
+        Livewire::actingAs($user)
+            ->test(\App\Livewire\RecipeDetail::class, ['id' => $recipe->id])
+            ->assertSee('Privat')
+            ->call('toggleShared')
+            ->assertSee('Freigegeben');
+
+        $recipe->refresh();
+        $this->assertTrue($recipe->is_shared);
+
+        // Erneut umschalten
+        Livewire::actingAs($user)
+            ->test(\App\Livewire\RecipeDetail::class, ['id' => $recipe->id])
+            ->call('toggleShared');
+
+        $recipe->refresh();
+        $this->assertFalse($recipe->is_shared);
+    }
+
+    public function test_recipe_form_saves_sharing_status(): void
+    {
+        $user = User::factory()->create();
+        $recipe = $this->makeRecipe($user, 'Testgericht', true);
+
+        Livewire::actingAs($user)
+            ->test(\App\Livewire\RecipeForm::class, ['id' => $recipe->id])
+            ->assertSet('is_shared', true)
+            ->set('is_shared', false)
+            ->call('save');
+
+        $recipe->refresh();
+        $this->assertFalse($recipe->is_shared);
+    }
 }
 

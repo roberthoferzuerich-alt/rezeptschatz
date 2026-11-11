@@ -183,8 +183,13 @@
                                 </span>
                             </button>
 
-                            <!-- Autor-Badge oben links -->
-                            @if (!$isMyRecipe)
+                            <!-- Autor- & Status-Badge oben links -->
+                            @if (!$recipe->is_shared)
+                                <span class="absolute top-2 left-2 bg-stone-900/75 backdrop-blur-xs text-white text-[10px] font-semibold px-2 py-0.5 rounded flex items-center space-x-1 shadow-xs" title="Privates Rezept (nur unter „Meine“ sichtbar)">
+                                    <span class="material-symbols-outlined text-[12px]">lock</span>
+                                    <span>Privat</span>
+                                </span>
+                            @elseif (!$isMyRecipe)
                                 <span class="absolute top-2 left-2 bg-black/60 backdrop-blur-xs text-white text-[10px] font-semibold px-2 py-0.5 rounded">
                                     {{ $recipe->user?->name ?: 'Geteilt' }}
                                 </span>
@@ -273,11 +278,19 @@
                             <div class="flex items-start justify-between">
                                 <div>
                                     <!-- Titel -->
-                                    <h3 class="text-sm sm:text-base font-bold text-stone-900 group-hover:text-[#8ea92c] transition truncate">
-                                        <a href="{{ route('recipes.show', $recipe->id) }}">
-                                            {{ $recipe->title }}
-                                        </a>
-                                    </h3>
+                                    <div class="flex items-center space-x-2">
+                                        <h3 class="text-sm sm:text-base font-bold text-stone-900 group-hover:text-[#8ea92c] transition truncate">
+                                            <a href="{{ route('recipes.show', $recipe->id) }}">
+                                                {{ $recipe->title }}
+                                            </a>
+                                        </h3>
+                                        @if (!$recipe->is_shared)
+                                            <span class="inline-flex items-center space-x-0.5 px-1.5 py-0.2 rounded text-[10px] font-semibold bg-stone-100 text-stone-600 border border-stone-200 shrink-0" title="Privates Rezept">
+                                                <span class="material-symbols-outlined text-[12px]">lock</span>
+                                                <span>Privat</span>
+                                            </span>
+                                        @endif
+                                    </div>
 
                                     <!-- 5 Sterne Bewertung -->
                                     <div class="flex items-center text-stone-300 text-xs mt-0.5 space-x-0.5">

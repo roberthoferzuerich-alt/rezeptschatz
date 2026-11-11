@@ -43,12 +43,21 @@
                 <span>Grunddaten</span>
             </h2>
 
-            <!-- Titel & Favorit -->
+            <!-- Titel, Freigabe & Favorit -->
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
-                <div class="sm:col-span-9">
+                <div class="sm:col-span-6">
                     <label class="block text-xs font-semibold text-stone-700 mb-1">Rezepttitel *</label>
                     <input wire:model="title" type="text" placeholder="z. B. Spinat-Nudelpfanne" required
                            class="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                </div>
+                <div class="sm:col-span-3 pt-4 sm:pt-0">
+                    <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-stone-50 border border-stone-200" title="Wenn aktiviert, erscheint das Rezept in der Gesamtansicht und bei Familie/Geteilt">
+                        <input wire:model="is_shared" type="checkbox" class="w-4 h-4 text-[#8ea92c] rounded border-stone-300 focus:ring-[#8ea92c]">
+                        <span class="text-xs font-semibold text-stone-700 flex items-center space-x-1">
+                            <span class="material-symbols-outlined text-[#8ea92c] text-base">share</span>
+                            <span>Freigegeben</span>
+                        </span>
+                    </label>
                 </div>
                 <div class="sm:col-span-3 pt-4 sm:pt-0">
                     <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-stone-50 border border-stone-200">
