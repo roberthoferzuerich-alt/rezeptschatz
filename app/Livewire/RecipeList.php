@@ -117,18 +117,20 @@ class RecipeList extends Component
     {
         $userId = Auth::id();
 
-        $query = Recipe::with(['categories', 'tags', 'user', 'favoritedBy', 'ingredients'])
-            ->where(function ($q) use ($userId) {
-                $q->where('user_id', $userId)
-                  ->orWhere('is_shared', true);
-            });
+        // Sichtbarkeit je nach Ansicht:
+        // - 'mine'   : alle eigenen Rezepte (auch nicht freigegebene)
+        // - 'shared' : freigegebene Rezepte anderer Benutzer
+        // - 'all'    : Gesamtansicht = nur freigegebene Rezepte (eigene nicht freigegebene bleiben privat)
+        $visible = function ($q) use ($userId) {
+            match ($this->authorFilter) {
+                'mine' => $q->where('user_id', $userId),
+                'shared' => $q->where('user_id', '!=', $userId)->where('is_shared', true),
+                default => $q->where('is_shared', true),
+            };
+        };
 
-        // Autorenfilter
-        if ($this->authorFilter === 'mine') {
-            $query->where('user_id', $userId);
-        } elseif ($this->authorFilter === 'shared') {
-            $query->where('user_id', '!=', $userId)->where('is_shared', true);
-        }
+        $query = Recipe::with(['categories', 'tags', 'user', 'favoritedBy', 'ingredients'])
+            ->where($visible);
 
         // Suche
         if (!empty(trim($this->search))) {
@@ -188,20 +190,14 @@ class RecipeList extends Component
 
         $recipes = $query->paginate(12);
 
-        $categories = Category::withCount(['recipes' => function ($rq) use ($userId) {
-            $rq->where('user_id', $userId)->orWhere('is_shared', true);
-        }])->orderBy('name')->get();
+        $categories = Category::withCount(['recipes' => $visible])->orderBy('name')->get();
 
         $tags = Tag::where('user_id', $userId)
-            ->withCount(['recipes' => function ($rq) use ($userId) {
-                $rq->where('user_id', $userId)->orWhere('is_shared', true);
-            }])->orderBy('name')->get();
+            ->withCount(['recipes' => $visible])->orderBy('name')->get();
 
         $selectedTagModel = !empty($this->selectedTag) ? Tag::find($this->selectedTag) : null;
 
-        $totalRecipeCount = Recipe::where(function ($q) use ($userId) {
-            $q->where('user_id', $userId)->orWhere('is_shared', true);
-        })->count();
+        $totalRecipeCount = Recipe::where($visible)->count();
 
         return view('livewire.recipe-list', [
             'recipes' => $recipes,
