@@ -229,9 +229,8 @@
 
                                 <ul class="divide-y divide-stone-100 text-sm">
                                     @foreach ($items as $ing)
-                                        <li class="py-2 flex items-baseline justify-between">
-                                            <span class="text-stone-800 font-medium">{{ $ing->name }}</span>
-                                            <span class="text-stone-600 font-semibold text-right whitespace-nowrap pl-4">
+                                        <li class="py-2 flex items-baseline">
+                                            <span class="text-stone-600 font-semibold w-28 sm:w-32 flex-shrink-0 pr-3">
                                                 @if ($ing->amount_numeric !== null)
                                                     @php
                                                         $scaled = round($ing->amount_numeric * $scaleFactor, 2);
@@ -246,6 +245,7 @@
                                                     <span class="text-xs font-normal text-stone-500">({{ $ing->amount_text }})</span>
                                                 @endif
                                             </span>
+                                            <span class="text-stone-800 font-medium flex-1">{{ $ing->name }}</span>
                                         </li>
                                     @endforeach
                                 </ul>
