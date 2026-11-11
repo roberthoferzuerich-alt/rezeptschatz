@@ -240,12 +240,13 @@
                                                 @elseif ($ing->unit)
                                                     {{ $ing->unit }}
                                                 @endif
-
+                                            </span>
+                                            <span class="text-stone-800 font-medium flex-1">
+                                                {{ $ing->name }}
                                                 @if ($ing->amount_text)
-                                                    <span class="text-xs font-normal text-stone-500">({{ $ing->amount_text }})</span>
+                                                    <span class="block text-xs font-normal text-stone-500">{{ $ing->amount_text }}</span>
                                                 @endif
                                             </span>
-                                            <span class="text-stone-800 font-medium flex-1">{{ $ing->name }}</span>
                                         </li>
                                     @endforeach
                                 </ul>
