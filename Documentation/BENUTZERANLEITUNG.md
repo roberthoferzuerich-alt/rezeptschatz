@@ -100,25 +100,34 @@ Die Navigation ist übersichtlich aufgeteilt:
 
 ## 4. Rezepte finden & kochen
 
-### Suche & Filter
+### Suche, Filter & Sichtbarkeit
 Auf der Hauptseite (`/recipes`) finden Sie jedes Gericht in Sekundenschnelle:
+- **Autoren-Reiter (Sichtbarkeit):**
+  - **„Alle Rezepte“ (Gesamtansicht):** Zeigt ausschliesslich freigegebene Rezepte. Eigene Rezepte, die Sie als privat markiert haben, sind hier zum Schutz Ihrer Privatsphäre ausgeblendet.
+  - **„Meine“:** Zeigt alle Ihre persönlichen Rezepte (sowohl freigegebene als auch private). Private Rezepte erkennen Sie am dunklen Badge `🔒 Privat`.
+  - **„Familie / Geteilt“:** Zeigt freigegebene Rezepte anderer Benutzer oder Familienmitglieder.
 - **Echtzeit-Suchfeld:** Tippen Sie beliebige Wörter ein (z. B. *„Hackfleisch“*, *„Risotto“*, *„Zitronen“*). Das System durchsucht Titel, Beschreibung und alle Zutaten live beim Tippen.
 - **Kategorie-Buttons:** Ein Klick auf *„Fleisch“*, *„Geflügel“*, *„Fisch“*, *„Teigwaren“*, *„Gemüse“*, *„Käse“* etc. filtert die Liste sofort.
 - **Schlagwörter / Tags:** Filter-Chips wie `#Schnell`, `#Gäste & Fest`, `#Backofen` grenzen die Treffer weiter ein.
 - **Favoriten-Filter (⭐):** Zeigt ausschliesslich Ihre Lieblingsrezepte an.
 - **Sortierung:** Wechseln Sie zwischen *„Neueste zuerst“*, *„Titel (A–Z)“* oder *„Zubereitungszeit“*.
+- **Ansichtsumschalter:** Wechseln Sie per Klick zwischen grosser Kachel- und kompakter Listenansicht.
 
-### Die Rezeptansicht
+### Die Rezeptansicht & ergonomisches Zutatenlayout
 Tippen Sie auf eine Rezeptkarte, um die Kochansicht zu öffnen:
 - **Grosses Rezeptbild:** Appetitliche Darstellung des fertigen Gerichts.
+- **Freigabestatus (1-Klick-Umschalter):** Direkt oben in der Aktionsleiste sehen Sie, ob Ihr Rezept `🌐 Freigegeben` oder `🔒 Privat` ist. Ein einfacher Klick schaltet den Status sofort um!
 - **Zeiten:** Vorbereitungszeit, Kochzeit und Ruhezeit.
 - **Nährwerte-Leiste pro Portion:**
   - Kalorien (kcal), Eiweiss (g), Fett (g) und Kohlenhydrate (g).
   - Über den Button **„Anpassen“** bzw. **„Nährwerte berechnen“** können fehlende Nährwerte per KI kalkuliert oder korrigiert werden.
-- **Zutatenliste:** Mit interaktiven Checkboxen zum Abhaken während des Kochens.
+- **Ergonomisches Zutatenlayout (Auge-freundlich):**
+  - **Ganz links:** Alle Mengenangaben und Einheiten (z. B. `400 g`, `2 Stück`, `1 TL`) stehen in einer festen, linksbündigen Spalte sauber untereinander ausgerichtet.
+  - **Rechts daneben:** Der Zutatennamen und darunter die Detailbeschreibung (z. B. *„fein gehackt“*, *„mittelgross“*). So erfasst das Auge beim Kochen die Mengen blitzschnell ohne langes Suchen.
 - **Dynamischer Portionsrechner:** Mit `+` und `-` Portionen ändern – alle Mengenangaben rechnen sich in Echtzeit mathematisch exakt um!
-- **Zubereitungsschritte:** Gut lesbare Nummerierung der Einzelschritte.
-- **Druckansicht & PDF-Export (🖨️):** Druckoptimierte Seite ohne störende Menüleisten.
+- **Zutaten zur Einkaufsliste:** Mit einem Klick auf **„Auf Einkaufsliste“** landen alle Zutaten direkt in der Einkaufsliste.
+- **Zubereitungsschritte:** Gut lesbare Nummerierung der Einzelschritte mit Markdown-Unterstützung.
+- **Druckansicht & PDF-Export (🖨️):** Druckoptimierte Seite ohne störende Menüleisten für die Küche.
 
 ---
 
@@ -133,11 +142,14 @@ Rezeptschatz bietet vier flexible Möglichkeiten, um neue Gerichte in Ihre Samml
 
 1. Wählen Sie im Menü **Rezepte > ➔ Rezept erstellen** (`/recipes/create`).
 2. Füllen Sie die Grunddaten aus (Titel, Beschreibung, Portionen, Zeiten).
-3. **Rezeptbild:** Foto hochladen (vom Tablet, Smartphone oder PC).
-4. **Zutaten erfassen:** Zeilenweise Menge, Einheit und Zutat eingeben.
-5. **Zubereitungsschritte:** Text eingeben und beliebig viele Schritte hinzufügen.
-6. **Kategorien & Schlagwörter:** Häkchen bei passenden Kategorien setzen.
-7. Auf **„Rezept speichern“** tippen.
+3. **Freigabe & Favorit:** 
+   - Über das Kontrollkästchen **„Freigegeben“** (standardmässig aktiviert) steuern Sie, ob das Rezept in der Gesamtansicht für andere sichtbar ist oder als `🔒 Privat` nur für Sie selbst.
+   - Mit dem **⭐ Favorit**-Kästchen kennzeichnen Sie persönliche Lieblingsrezepte.
+4. **Rezeptbild:** Foto hochladen (vom Tablet, Smartphone oder PC).
+5. **Zutaten erfassen:** Zeilenweise Menge, Einheit und Zutat eingeben.
+6. **Zubereitungsschritte:** Text eingeben und beliebig viele Schritte hinzufügen.
+7. **Kategorien & Schlagwörter:** Häkchen bei passenden Kategorien setzen.
+8. Auf **„Rezept speichern“** tippen.
 
 ---
 
@@ -290,6 +302,13 @@ sudo git pull
 php artisan optimize:clear
 sudo systemctl restart php*-fpm
 ```
+
+> **Tipp bei Git-Fehlermeldungen („dubiose Besitzverhältnisse“ oder Permission denied bei FETCH_HEAD):**
+> Sollte Git die Aktualisierung verweigern, liegt das daran, dass der Server-Ordner dem Benutzer `pi` gehört, aber Webserver-Prozesse darauf zugreifen. Einmalig ausführen:
+> ```bash
+> git config --global --add safe.directory /var/www/rezeptschatz
+> sudo chown -R pi:www-data /var/www/rezeptschatz/.git
+> ```
 
 ### Neuer Nährwert-Konsolenbefehl (`get:nutritional-val`)
 Ermittelt, berechnet und speichert Nährwerte für jedes Rezept direkt im Terminal:
