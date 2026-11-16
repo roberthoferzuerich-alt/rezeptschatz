@@ -142,6 +142,13 @@
             Hilfe und Support
         </a>
         <hr class="my-1 border-stone-100">
+        <a href="{{ route('download') }}" target="_blank" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-emerald-700 font-semibold text-stone-800 transition">
+            <span class="flex items-center space-x-2">
+                <span class="material-symbols-outlined text-base text-emerald-600">install_mobile</span>
+                <span>App herunterladen</span>
+            </span>
+            <span class="text-[10px] uppercase font-bold bg-emerald-600 text-white px-1.5 py-0.5 rounded">APK</span>
+        </a>
         <a href="{{ route('manual') }}" class="flex items-center justify-between px-4 py-2 hover:bg-stone-50 hover:text-[#8ea92c] font-semibold text-stone-800 transition">
             <span class="flex items-center space-x-2">
                 <span class="material-symbols-outlined text-base text-[#8ea92c]">menu_book</span>

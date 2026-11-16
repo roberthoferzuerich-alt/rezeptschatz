@@ -265,6 +265,13 @@
                     <span>Schlagwörter</span>
                     <span class="text-[10px] uppercase font-bold bg-[#8ea92c]/15 text-[#8ea92c] px-1.5 py-0.5 rounded">Neu</span>
                 </a>
+                <a href="{{ route('download') }}" target="_blank" class="block px-3 py-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold flex items-center justify-between transition mt-2">
+                    <span class="flex items-center space-x-2">
+                        <span class="material-symbols-outlined text-emerald-600 text-base">install_mobile</span>
+                        <span>App herunterladen (APK)</span>
+                    </span>
+                    <span class="text-[10px] uppercase font-bold bg-emerald-600 text-white px-1.5 py-0.5 rounded">App</span>
+                </a>
             </div>
 
             <div class="pt-2 border-t border-stone-200 space-y-1 text-sm font-medium">
