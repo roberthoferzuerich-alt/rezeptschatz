@@ -26,6 +26,31 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 });
 
+// Öffentliche Download-Landingpage (Android APK & iOS Safari Web-App)
+Route::view('/download', 'download')->name('download');
+Route::view('/downlaod', 'download'); // Alias für Tippfehler /downlaod
+
+// Direkte APK-Auslieferung mit korrekten MIME-Headern
+Route::get('/download/apk', function () {
+    $candidates = [
+        public_path('downloads/RezeptSchatz.apk'),
+        public_path('download/RezeptSchatz.apk'),
+    ];
+    foreach ($candidates as $file) {
+        if (file_exists($file)) {
+            return response()->download($file, 'RezeptSchatz.apk', [
+                'Content-Type' => 'application/vnd.android.package-archive',
+                'Cache-Control' => 'no-cache, must-revalidate',
+            ]);
+        }
+    }
+    abort(404, 'APK-Datei nicht gefunden.');
+})->name('download.apk');
+
+Route::get('/downlaod/apk', function () {
+    return redirect()->route('download.apk');
+});
+
 // Abmeldung
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
